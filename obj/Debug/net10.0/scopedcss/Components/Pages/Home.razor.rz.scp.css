@@ -1,0 +1,130 @@
+/* Vintage Edison Lightbulb Theme Styles */
+
+.theme-living[b-wh4pot77dl] {
+  --bg-color: #44352e; /* Cream */
+  --text-color: #f5d8ae; /* Saddle Brown */
+  --accent-color: #8a6956; /* Amber */
+  --border-color: #d5b397; /* Goldenrod */
+  --shadow-color: rgb(187, 183, 180, 0.3);
+}
+
+.theme-study[b-wh4pot77dl] {
+  --bg-color: #f5deb3; /* Wheat */
+  --text-color: #654321; /* Dark Brown */
+  --accent-color: #ffd700; /* Gold */
+  --border-color: #b8860b; /* Dark Goldenrod */
+  --shadow-color: rgba(255, 215, 0, 0.3);
+}
+
+.theme-bedroom[b-wh4pot77dl] {
+  --bg-color: #ffe4b5; /* Moccasin */
+  --text-color: #a0522d; /* Sienna */
+  --accent-color: #ffa500; /* Orange */
+  --border-color: #cd853f; /* Peru */
+  --shadow-color: rgba(255, 165, 0, 0.3);
+}
+
+.theme-default[b-wh4pot77dl] {
+  --bg-color: #ffffff; /* White */
+  --text-color: #333333; /* Dark Gray */
+  --accent-color: #808080; /* Gray */
+  --border-color: #cccccc; /* Light Gray */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.container[b-wh4pot77dl] {
+  max-width: 900px;
+  height: 100vh;
+  margin: 0;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 20px;
+  box-shadow: none;
+  border: none;
+}
+
+h1[b-wh4pot77dl] {
+  text-align: left;
+  color: var(--accent-color);
+  text-shadow: 2px 2px 4px var(--shadow-color);
+  font-size: 2.5em;
+}
+
+p[b-wh4pot77dl] {
+  font-size: 1.2em;
+  line-height: 1.6;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.note-container[b-wh4pot77dl] {
+  margin: 20px 0;
+}
+
+.note-area[b-wh4pot77dl] {
+  width: 100%;
+  height: 400px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333333;
+  font-family: inherit;
+  font-size: 1em;
+}
+
+.notes-saved[b-wh4pot77dl] {
+  margin-top: 20px;
+}
+
+.note-saved[b-wh4pot77dl] {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.btn[b-wh4pot77dl] {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  margin: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn:hover[b-wh4pot77dl] {
+  background-color: var(--border-color);
+}
+
+.theme-buttons[b-wh4pot77dl] {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.theme-select[b-wh4pot77dl] {
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid var(--border-color);
+  font-size: 1em;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  font-family: "Georgia", serif;
+  min-width: 150px;
+}
+
+.theme-select:hover[b-wh4pot77dl] {
+  opacity: 0.9;
+}
+
+.theme-select option[b-wh4pot77dl] {
+  padding: 10px;
+  margin: 5px 0;
+}

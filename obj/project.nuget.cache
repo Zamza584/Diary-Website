@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "lmSmqD1rLds=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Jupiter\\Documents\\web-projects\\NoteKeeping\\NoteKeeping.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Jupiter\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.1\\microsoft.aspnetcore.app.internal.assets.10.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
