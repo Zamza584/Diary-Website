@@ -371,10 +371,10 @@ main[b-iysa7z3inu] {
         opacity: 0;
     }
 }
-/* /Components/Pages/Home.razor.rz.scp.css */
+/* /Pages/Home.razor.rz.scp.css */
 /* Vintage Edison Lightbulb Theme Styles */
 
-.theme-living[b-wh4pot77dl] {
+.theme-living[b-ujv6ega1qq] {
   --bg-color: #44352e; /* Cream */
   --text-color: #f5d8ae; /* Saddle Brown */
   --accent-color: #8a6956; /* Amber */
@@ -382,7 +382,7 @@ main[b-iysa7z3inu] {
   --shadow-color: rgb(187, 183, 180, 0.3);
 }
 
-.theme-study[b-wh4pot77dl] {
+.theme-study[b-ujv6ega1qq] {
   --bg-color: #f5deb3; /* Wheat */
   --text-color: #654321; /* Dark Brown */
   --accent-color: #ffd700; /* Gold */
@@ -390,7 +390,7 @@ main[b-iysa7z3inu] {
   --shadow-color: rgba(255, 215, 0, 0.3);
 }
 
-.theme-bedroom[b-wh4pot77dl] {
+.theme-bedroom[b-ujv6ega1qq] {
   --bg-color: #ffe4b5; /* Moccasin */
   --text-color: #a0522d; /* Sienna */
   --accent-color: #ffa500; /* Orange */
@@ -398,7 +398,7 @@ main[b-iysa7z3inu] {
   --shadow-color: rgba(255, 165, 0, 0.3);
 }
 
-.theme-default[b-wh4pot77dl] {
+.theme-default[b-ujv6ega1qq] {
   --bg-color: #ffffff; /* White */
   --text-color: #333333; /* Dark Gray */
   --accent-color: #808080; /* Gray */
@@ -406,7 +406,7 @@ main[b-iysa7z3inu] {
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-.container[b-wh4pot77dl] {
+.container[b-ujv6ega1qq] {
   max-width: 900px;
   height: 100vh;
   margin: 0;
@@ -417,25 +417,25 @@ main[b-iysa7z3inu] {
   border: none;
 }
 
-h1[b-wh4pot77dl] {
+h1[b-ujv6ega1qq] {
   text-align: left;
   color: var(--accent-color);
   text-shadow: 2px 2px 4px var(--shadow-color);
   font-size: 2.5em;
 }
 
-p[b-wh4pot77dl] {
+p[b-ujv6ega1qq] {
   font-size: 1.2em;
   line-height: 1.6;
   text-align: left;
   margin-bottom: 30px;
 }
 
-.note-container[b-wh4pot77dl] {
+.note-container[b-ujv6ega1qq] {
   margin: 20px 0;
 }
 
-.note-area[b-wh4pot77dl] {
+.note-area[b-ujv6ega1qq] {
   width: 100%;
   height: 400px;
   padding: 15px;
@@ -446,11 +446,11 @@ p[b-wh4pot77dl] {
   font-size: 1em;
 }
 
-.notes-saved[b-wh4pot77dl] {
+.notes-saved[b-ujv6ega1qq] {
   margin-top: 20px;
 }
 
-.note-saved[b-wh4pot77dl] {
+.note-saved[b-ujv6ega1qq] {
   background-color: #ffffff;
   border: 1px solid #cccccc;
   border-radius: 8px;
@@ -460,7 +460,7 @@ p[b-wh4pot77dl] {
   color: #000000;
 }
 
-.btn[b-wh4pot77dl] {
+.btn[b-ujv6ega1qq] {
   background-color: var(--accent-color);
   color: var(--text-color);
   border: none;
@@ -472,16 +472,16 @@ p[b-wh4pot77dl] {
   transition: background-color 0.3s;
 }
 
-.btn:hover[b-wh4pot77dl] {
+.btn:hover[b-ujv6ega1qq] {
   background-color: var(--border-color);
 }
 
-.theme-buttons[b-wh4pot77dl] {
+.theme-buttons[b-ujv6ega1qq] {
   text-align: center;
   margin-bottom: 20px;
 }
 
-.theme-select[b-wh4pot77dl] {
+.theme-select[b-ujv6ega1qq] {
   padding: 10px;
   border-radius: 5px;
   border: 2px solid var(--border-color);
@@ -494,11 +494,11 @@ p[b-wh4pot77dl] {
   min-width: 150px;
 }
 
-.theme-select:hover[b-wh4pot77dl] {
+.theme-select:hover[b-ujv6ega1qq] {
   opacity: 0.9;
 }
 
-.theme-select option[b-wh4pot77dl] {
+.theme-select option[b-ujv6ega1qq] {
   padding: 10px;
   margin: 5px 0;
 }

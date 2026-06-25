@@ -6,5 +6,6 @@ public class Notebook
     public int CurrentPage { get; set; }
     public int TotalPages { get; set; }
     public List<Note> Notes { get; set; } = new List<Note>();
-
 }
+
+

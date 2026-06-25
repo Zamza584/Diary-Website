@@ -1,0 +1,157 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Web;
+
+<PageTitle>Notes</PageTitle>
+
+@inject ThemeService ThemeService
+
+<div class="theme-@Theme"
+     style="background-color: @ThemeService.BgColor; color: @ThemeService.TextColor; font-family: 'Georgia', serif; transition: background-color 0.5s, color 0.5s;">
+    <div class="container">
+        <h1 style="color: @ThemeService.AccentColor;">Welcome to your Diary</h1>
+
+        <p>Welcome to a quiet space where your thoughts can unfold like pages touched by time — a place to gather
+            fleeting
+            moments, whisper your truths, and let your inner voice take shape without judgment. Here, every word,
+            whether soft
+            or overflowing, becomes part of a living story, gently weaving the ordinary and the profound into something
+            deeply
+            and unmistakably yours.</p>
+
+            <div class="theme-buttons">
+                <select class="theme-select" value="@Theme" @onchange="HandleThemeChange"
+                        style="background-color: @ThemeService.AccentColor !important; color: @ThemeService.TextColor !important; border: 2px solid @ThemeService.BorderColor;">
+                    <option value="default">Default</option>
+                    <option value="living">Living Room</option>
+                    <option value="study">Study</option>
+                    <option value="bedroom">Bedroom</option>
+                </select>
+            </div>
+
+            <div class="note-container flex flex-row">
+                <div class="flex-grow-1">
+                    <label for="note-box"></label>
+                    <textarea class="note-area" name="note" @bind="textValue" @bind:event="oninput" @bind:after="SaveNote"
+                              @onkeydown="HandleNoteKeyDown" placeholder="Write Something Interesting" id="note-box"></textarea>
+                    <p>Page @notebook?.CurrentPage/@notebook?.TotalPages</p>
+
+               
+                    <button @onclick="NextPage" class="btn btn-primary"
+                            style="background-color: @ThemeService.AccentColor; color: @ThemeService.TextColor;">Next
+                        Page</button>
+                        <button @onclick="PreviousPage" class="btn btn-primary"
+                                style="background-color: @ThemeService.AccentColor; color: @ThemeService.TextColor;">Previous
+                            Page</button>
+                            <button @onclick="SaveNote" class="btn btn-primary"
+                                    style="background-color: @ThemeService.AccentColor; color: @ThemeService.TextColor;">Save
+                                Note</button>
+
+                            </div>
+
+                            <div class="notes-saved">
+                                @foreach (Note savedNote in savedNotes ?? new List<Note>())
+                                {
+                                    <div class="note-saved">
+                                        @(savedNote.Text)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+           
+                </div>
+
+@code {
+
+    public string Theme => ThemeService.Theme;
+    public string textValue = "";
+    Notebook? notebook;
+    Note? currentNote;
+    List<Note>? savedNotes;
+
+    private async Task HandleThemeChange(ChangeEventArgs e)
+    {
+        if (e.Value is string newTheme)
+        {
+            await ThemeService.SetTheme(newTheme);
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ThemeService.OnThemeChanged += OnThemeChangedHandler;
+
+        notebook = new();
+        notebook.TotalPages = 20;
+        notebook.CurrentPage = 1;
+
+        notebook.Notes = new List<Note>();
+        for (int i = 0; i < notebook.TotalPages; i++)
+        {
+            notebook.Notes.Add(new Note());
+        }
+
+        notebook.Notes[index: 0].Text = "Journal--------";
+        currentNote = notebook.Notes[notebook.CurrentPage - 1];
+        textValue = currentNote.Text;
+
+    }
+
+    void SetCurrentNote()
+    {
+        if (notebook == null) return;
+        currentNote = notebook.Notes[notebook.CurrentPage - 1];
+        textValue = currentNote?.Text ?? "";
+    }
+
+    public void NextPage()
+    {
+        if (notebook != null && notebook?.CurrentPage < notebook?.TotalPages)
+        {
+            notebook.CurrentPage++;
+            SetCurrentNote();
+        }
+    }
+
+    public void PreviousPage()
+    {
+        if (notebook != null && notebook?.CurrentPage > 1)
+        {
+            notebook.CurrentPage--;
+            SetCurrentNote();
+        }
+    }
+
+    public void SaveNote()
+    {
+        if (currentNote == null) return;
+        currentNote.Text = textValue;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= OnThemeChangedHandler;
+    }
+
+    private async Task OnThemeChangedHandler()
+    {
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    void HandleNoteKeyDown(KeyboardEventArgs e)
+    {
+        if (e.CtrlKey && e.Key == "ArrowRight")
+        {
+            NextPage();
+        }
+        else if (e.CtrlKey && e.Key == "ArrowLeft")
+        {
+            PreviousPage();
+        }
+    }
+
+}

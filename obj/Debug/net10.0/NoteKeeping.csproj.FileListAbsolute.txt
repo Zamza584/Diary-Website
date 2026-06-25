@@ -165,7 +165,8 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\refint\Not
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\NoteKeeping.pdb
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\NoteKeeping.genruntimeconfig.cache
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\ref\NoteKeeping.dll
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Components\Pages\Home.razor.rz.scp.css
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-05odaqod1i-05odaqod1i.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-wi7zzxd8l0-wi7zzxd8l0.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-wi7zzxd8l0-wi7zzxd8l0.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\NoteKeeping.sourcelink.json
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Pages\Home.razor.rz.scp.css
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-7btjv76bgd-7btjv76bgd.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-7btjv76bgd-7btjv76bgd.gz
