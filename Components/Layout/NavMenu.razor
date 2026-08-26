@@ -1,23 +1,53 @@
-﻿<div class="navigation">
-    <div class="top-row ps-3 navbar navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="">Diary</a>
-        </div>
-    </div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Antiforgery
+@inject IAntiforgery Antiforgery
+@inject IHttpContextAccessor HttpContextAccessor
 
-
+<div class="navigation">
     <div>
         <nav class="nav flex-column">
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-                </NavLink>
-                <NavLink class="nav-link" href="/login" Match="NavLinkMatch.All">
-                    <span class="bi" aria-hidden="true"></span> Login
-                </NavLink>
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                            <span class="bi" aria-hidden="true"></span> Home
+                        </NavLink>
+
+                        <form method="post" action="/logout" class="d-block">
+                            <input type="hidden" name="__RequestVerificationToken" value="@GetRequestToken()" />
+                            <button type="submit"
+                                    class="nav-link btn btn-link text-start p-0 w-100 text-decoration-none"
+                                    style="color: inherit;">
+                                <span class="bi" aria-hidden="true"></span> Logout
+                            </button>
+                        </form>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                            <span class="bi" aria-hidden="true"></span> Home
+                        </NavLink>
+                        <NavLink class="nav-link" href="/login" Match="NavLinkMatch.All">
+                            <span class="bi" aria-hidden="true"></span> Login
+                        </NavLink>
+                        <NavLink class="nav-link" href="/register" Match="NavLinkMatch.All">
+                            <span class="bi" aria-hidden="true"></span> Register
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </nav>
     </div>
 </div>
+
 @code {
+    private string GetRequestToken()
+    {
+        var httpContext = HttpContextAccessor.HttpContext;
+        if (httpContext is null)
+        {
+            return string.Empty;
+        }
+
+        return Antiforgery.GetAndStoreTokens(httpContext).RequestToken ?? string.Empty;
+    }
 }

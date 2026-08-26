@@ -1,26 +1,84 @@
 @page "/login"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Antiforgery
+@using Microsoft.AspNetCore.Components
+@using Microsoft.EntityFrameworkCore
+@using NoteKeeping.Data
+@using NoteKeeping.Models
+@inject IAntiforgery Antiforgery
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NoteKeepingDbContext DbContext
+@inject NavigationManager Navigation
 
 <PageTitle>Login</PageTitle>
 
-<div class="container d-flex justify-content-center">
-    <div class="form">
-        <h1>Hello!</h1>
-        <p>Sign up and get started creating notes.</p>
+<div class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <span class="auth-kicker">Welcome back</span>
+                <h1>Sign in</h1>
+                <p>Access your notes and continue your writing flow.</p>
+            </div>
 
-        <label class="d-block" for="email">
-            Email
-            <input class="form-control" type="email" name="email" id="email">
-        </label>
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="auth-alert auth-alert-error" aria-live="polite">@ErrorMessage</div>
+            }
 
-        <label class="d-block" for="password">
-            Password
-            <input class="form-control" type="password" name="password" id="password">  
-        </label>
+            <form class="auth-form" method="post" action="/login">
+                <input type="hidden" name="__RequestVerificationToken" value="@GetRequestToken()" />
+                <div class="auth-field">
+                    <label for="email">Email</label>
+                    <input class="auth-input" type="email" name="email" id="email" @bind="Email"
+                           placeholder="you@example.com">
+                </div>
 
-        <p><a href="">Forgot Password?</a></p>
+                <div class="auth-field">
+                    <label for="password">Password</label>
+                    <input class="auth-input" type="password" name="password" id="password" @bind="Password"
+                           placeholder="Enter your password">
+                </div>
 
-        <button class="btn btn-primary">Login</button>
+                <div class="auth-link-row">
+                    <a href="">Forgot password?</a>
+                </div>
+
+                <div class="auth-actions">
+                    <button class="auth-button auth-button-primary" type="submit">Login</button>
+                    <a class="auth-button auth-button-secondary" href="/register">Create account</a>
+                </div>
+            </form>
+        </div>
     </div>
-
 </div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        ErrorMessage = Error switch
+        {
+            "missing" => "Please enter both email and password.",
+            "invalid" => "Email or password is incorrect.",
+            _ => string.Empty
+        };
+    }
+
+    private string GetRequestToken()
+    {
+        var httpContext = HttpContextAccessor.HttpContext;
+        if (httpContext is null)
+        {
+            return string.Empty;
+        }
+
+        return Antiforgery.GetAndStoreTokens(httpContext).RequestToken ?? string.Empty;
+    }
+}
