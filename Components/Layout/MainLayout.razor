@@ -1,16 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    
-    <div class="sidebar">
-        <NavMenu />
+    <div>
+@* logo *@
     </div>
-
     <main>
         <article class="content">
             @Body
         </article>
     </main>
+    <div class="sidebar">
+        <NavMenu />
+    </div>
 </div>
 
 <div id="blazor-error-ui">

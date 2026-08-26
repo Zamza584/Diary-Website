@@ -1,7 +1,5 @@
 .navigation[b-zlgbdk1gca] {
-  width: 250px;
-  height: 100vh;
-  background-color: #44352e;
+  display: none;
 }
 
 /* ========================================
@@ -10,15 +8,6 @@
 .top-row[b-zlgbdk1gca] {
   min-height: 3.5rem;
   background-color: inherit;
-}
-
-/* ========================================
-   NAVBAR BRAND (Logo/Title)
-   ======================================== */
-.navbar-brand[b-zlgbdk1gca] {
-  font-size: 1.1rem;
-  color: white;
-  font-weight: bold;
 }
 
 /* ========================================
@@ -59,14 +48,16 @@
 /* Navigation Links */
 .nav-item[b-zlgbdk1gca]  .nav-link {
   color: white;
-  background: none;
+  font-family: "Inknut Antiqua", serif;
+  background: #325092;
+  margin-top: 25px;
   border: none;
-  border-radius: 4px;
-  height: 3rem;
   display: flex;
   align-items: center;
   line-height: 3rem;
-  width: 100%;
+  border-radius: 8px;
+  width: 146px;
+  height: 56px;
 }
 
 /* Active Link State */
@@ -88,5 +79,11 @@
 @media (min-width: 641px) {
   .navbar-toggler[b-zlgbdk1gca] {
     display: none;
+  }
+  .navigation[b-zlgbdk1gca] {
+    display: block;
+    width: 180px;
+    height: 100vh;
+    background-color: #1a293f;
   }
 }

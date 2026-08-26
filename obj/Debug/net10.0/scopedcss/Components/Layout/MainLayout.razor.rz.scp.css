@@ -5,6 +5,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 /* ========================================
@@ -101,7 +102,6 @@ main[b-iysa7z3inu] {
   }
 
   .sidebar[b-iysa7z3inu] {
-    width: 250px;
     height: 100vh;
     position: sticky;
     top: 0;

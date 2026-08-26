@@ -1,0 +1,131 @@
+@page "/register"
+@rendermode InteractiveServer
+@using System.Net.Mail
+@using Microsoft.EntityFrameworkCore
+@using NoteKeeping.Data
+@using NoteKeeping.Models
+@inject NoteKeepingDbContext DbContext
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<div class="auth-page">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <span class="auth-kicker">Start writing</span>
+                <h1>Create account</h1>
+                <p>Set up your journal and keep your thoughts organized.</p>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="auth-alert auth-alert-error" aria-live="polite">@ErrorMessage</div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(SuccessMessage))
+            {
+                <div class="auth-alert auth-alert-success" aria-live="polite">@SuccessMessage</div>
+            }
+
+            <div class="auth-form">
+                <div class="auth-field">
+                    <label for="name">Name</label>
+                    <input class="auth-input" type="text" name="name" id="name" @bind="Name"
+                           placeholder="Your display name">
+                </div>
+
+                <div class="auth-field">
+                    <label for="email">Email</label>
+                    <input class="auth-input" type="email" name="email" id="email" @bind="Email"
+                           placeholder="you@example.com">
+                </div>
+
+                <div class="auth-field">
+                    <label for="password">Password</label>
+                    <input class="auth-input" type="password" name="password" id="password" @bind="Password"
+                           placeholder="Create a password">
+                </div>
+
+                <div class="auth-actions">
+                    <button class="auth-button auth-button-primary" type="button" @onclick="RegisterAsync">Create
+                        account</button>
+                        <a class="auth-button auth-button-secondary" href="/login">Back to login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@code {
+    private string Name { get; set; } = string.Empty;
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string ErrorMessage { get; set; } = string.Empty;
+    private string SuccessMessage { get; set; } = string.Empty;
+
+    private async Task RegisterAsync()
+    {
+        SuccessMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        {
+            ErrorMessage = "Please enter your name, email, and password.";
+            return;
+        }
+
+        var normalizedName = Name.Trim();
+        var normalizedEmail = Email.Trim();
+
+        try
+        {
+            var mailAddress = new MailAddress(normalizedEmail);
+            if (mailAddress.Address != normalizedEmail)
+            {
+                ErrorMessage = "Please enter a valid email address.";
+                return;
+            }
+        }
+        catch
+        {
+            ErrorMessage = "Please enter a valid email address.";
+            return;
+        }
+
+        if (Password.Length < 6)
+        {
+            ErrorMessage = "Password must be at least 6 characters long.";
+            return;
+        }
+
+        var lowerEmail = normalizedEmail.ToLower();
+        var exists = await DbContext.UserAccounts.AnyAsync(u => u.Email.ToLower() == lowerEmail);
+
+        if (exists)
+        {
+            ErrorMessage = "That email is already registered.";
+            return;
+        }
+
+        var user = new UserAccount
+        {
+            Name = normalizedName,
+            Email = lowerEmail,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        DbContext.UserAccounts.Add(user);
+        await DbContext.SaveChangesAsync();
+
+        SuccessMessage = "Account created successfully.";
+        ErrorMessage = string.Empty;
+
+        Name = string.Empty;
+        Email = string.Empty;
+        Password = string.Empty;
+
+        await Task.Delay(500);
+        Navigation.NavigateTo("/login");
+    }
+}
