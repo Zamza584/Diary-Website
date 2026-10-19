@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using static Microsoft.AspNetCore.Components.Web.RenderMode
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,9 +17,54 @@
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script>
+            window.animateJournalPageButton = (element) => {
+                if (!element || !window.gsap) return;
+                window.gsap.fromTo(element, { scale: 1 }, {
+                    scale: 1.20,
+                    duration: 0.14,
+                    repeat: 1,
+                    yoyo: true,
+                    ease: 'power1.out',
+                    clearProps: 'transform'
+                });
+            };
+
+            window.getContentEditableHtml = (element) => {
+                return element ? element.innerHTML : '';
+            };
+
+            window.setContentEditableHtml = (element, html) => {
+                if (!element) return;
+                element.innerHTML = html || '';
+            };
+
+            window.formatContentEditableSelection = (element, format) => {
+                if (!element) return null;
+
+                const selection = window.getSelection();
+                if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+
+                const range = selection.getRangeAt(0);
+                if (!element.contains(range.commonAncestorContainer)) return null;
+
+                const commands = {
+                    italic: 'italic',
+                    bold: 'bold',
+                    underline: 'underline'
+                };
+                const command = commands[format];
+                if (!command) return null;
+
+                element.focus();
+                document.execCommand(command, false);
+                return element.innerHTML;
+            };
+    </script>
 </body>
 
 </html>

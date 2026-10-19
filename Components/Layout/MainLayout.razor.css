@@ -83,6 +83,13 @@ main {
    MOBILE RESPONSIVE (Up to 640px)
    ======================================== */
 @media (max-width: 640.98px) {
+  .sidebar {
+    position: absolute;
+    top: 31px;
+    right: 14px;
+    z-index: 20;
+  }
+
   .top-row {
     justify-content: space-between;
   }

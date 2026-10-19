@@ -34,6 +34,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Components/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSZWRpcmVjdFRvTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -73,3 +77,7 @@ build_metadata.AdditionalFiles.CssScope = b-2lr7fnuged
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-ujv6ega1qq
+
+[C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/Journals.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm91cm5hbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-0va9pqgd4z

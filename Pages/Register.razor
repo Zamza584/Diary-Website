@@ -1,5 +1,4 @@
 @page "/register"
-@rendermode InteractiveServer
 @using System.Net.Mail
 @using Microsoft.EntityFrameworkCore
 @using NoteKeeping.Data
@@ -92,9 +91,9 @@
             return;
         }
 
-        if (Password.Length < 6)
+        if (Password.Length < 12)
         {
-            ErrorMessage = "Password must be at least 6 characters long.";
+            ErrorMessage = "Password must be at least 12 characters long.";
             return;
         }
 
