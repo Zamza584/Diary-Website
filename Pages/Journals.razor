@@ -1,0 +1,114 @@
+@page "/journals"
+@attribute [Authorize]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using NoteKeeping.Models
+@using NoteKeeping.Data
+
+<PageTitle>Journals</PageTitle>
+
+@inject NoteKeepingDbContext DbContext
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<main class="journal-library">
+    <header class="journal-library-header">
+        <h1>Journals</h1>
+        <button class="add-journal" type="button" @onclick="CreateJournalAsync" disabled="@isAddingJournal">
+            @(isAddingJournal ? "Adding..." : "Add Now")
+        </button>
+    </header>
+
+    <section class="journal-grid" aria-label="Your journals">
+        @foreach (var journal in journals)
+        {
+            <NavLink class="journal-cover" href="@($"/journals/{journal.Id}")"
+                     aria-label="@($"Open {journal.Title}, dated {journal.Date:d}, {journal.TotalPages} pages")">
+                <div class="journal-cover-title">@journal.Title</div>
+            </NavLink>
+        }
+    </section>
+</main>
+
+@code {
+    private List<Notebook> journals = new();
+    private int? userAccountId;
+    private bool isAddingJournal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            journals = new();
+            return;
+        }
+
+        var email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity.Name ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            journals = new();
+            return;
+        }
+
+        var userAccount = await DbContext.UserAccounts
+            .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+        if (userAccount is null)
+        {
+            return;
+        }
+
+        userAccountId = userAccount.Id;
+        journals = await DbContext.Notebooks
+            .Where(n => n.UserAccountId == userAccount.Id)
+            .OrderByDescending(n => n.Date)
+            .ThenByDescending(n => n.Id)
+            .ToListAsync();
+    }
+
+    private async Task CreateJournalAsync()
+    {
+        if (isAddingJournal)
+        {
+            return;
+        }
+
+        if (userAccountId is null)
+        {
+            throw new InvalidOperationException("The signed-in account could not be found.");
+        }
+
+        isAddingJournal = true;
+
+        try
+        {
+            var journal = new Notebook
+            {
+                Title = "Diary",
+                Date = DateTime.Today,
+                CurrentPage = 1,
+                TotalPages = 20,
+                UserAccountId = userAccountId.Value,
+                Notes = Enumerable.Range(0, 20)
+                    .Select(index => new Note
+                    {
+                        Date = index == 0 ? DateTime.Today : null,
+                        Text = index == 0 ? "Journal" : string.Empty
+                    })
+                    .ToList()
+            };
+
+            DbContext.Notebooks.Add(journal);
+            await DbContext.SaveChangesAsync();
+            journals.Insert(0, journal);
+        }
+        finally
+        {
+            isAddingJournal = false;
+        }
+    }
+}

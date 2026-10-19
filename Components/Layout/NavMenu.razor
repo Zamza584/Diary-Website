@@ -3,14 +3,20 @@
 @inject IAntiforgery Antiforgery
 @inject IHttpContextAccessor HttpContextAccessor
 
-<div class="navigation">
-    <div>
+<div class="navigation @(isMenuOpen ? "open" : "")">
+    <button class="navbar-toggler" type="button" aria-label="Toggle navigation"
+            aria-expanded="@isMenuOpen" @onclick="ToggleMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="navigation-links">
         <nav class="nav flex-column">
             <div class="nav-item px-3">
                 <AuthorizeView>
                     <Authorized>
-                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                            <span class="bi" aria-hidden="true"></span> Home
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            Home
                         </NavLink>
 
                         <form method="post" action="/logout" class="d-block">
@@ -18,19 +24,22 @@
                             <button type="submit"
                                     class="nav-link btn btn-link text-start p-0 w-100 text-decoration-none"
                                     style="color: inherit;">
-                                <span class="bi" aria-hidden="true"></span> Logout
+                                Logout
                             </button>
                         </form>
                     </Authorized>
                     <NotAuthorized>
-                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                            <span class="bi" aria-hidden="true"></span> Home
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            Home
                         </NavLink>
-                        <NavLink class="nav-link" href="/login" Match="NavLinkMatch.All">
-                            <span class="bi" aria-hidden="true"></span> Login
+                        <NavLink class="nav-link" href="/login" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            Login
                         </NavLink>
-                        <NavLink class="nav-link" href="/register" Match="NavLinkMatch.All">
-                            <span class="bi" aria-hidden="true"></span> Register
+                        <NavLink class="nav-link" href="/register" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            Register
+                        </NavLink>
+                        <NavLink class="nav-link" href="/journals" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                            Journals
                         </NavLink>
                     </NotAuthorized>
                 </AuthorizeView>
@@ -40,6 +49,18 @@
 </div>
 
 @code {
+    private bool isMenuOpen;
+
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private void CloseMenu()
+    {
+        isMenuOpen = false;
+    }
+
     private string GetRequestToken()
     {
         var httpContext = HttpContextAccessor.HttpContext;

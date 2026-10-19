@@ -36,7 +36,6 @@ public class NoteKeepingDbContext : DbContext
         {
             entity.HasKey(n => n.Id);
             entity.Property(n => n.Text).IsRequired();
-            entity.Property(n => n.Date).IsRequired();
             entity.HasOne(n => n.Notebook)
                 .WithMany(n => n.Notes)
                 .HasForeignKey(n => n.NotebookId)

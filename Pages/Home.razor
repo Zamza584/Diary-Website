@@ -1,5 +1,5 @@
 ﻿@page "/"
-@rendermode InteractiveServer
+@page "/journals/{JournalId:int}"
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.EntityFrameworkCore
@@ -7,30 +7,49 @@
 @using NoteKeeping.Models
 @using NoteKeeping.Services
 @using System.Security.Claims
+@using System.Globalization
 
-<PageTitle>Notes</PageTitle>
+
+<PageTitle>@(JournalId.HasValue ? notebook?.Title ?? "Journal unavailable" : "Notes")</PageTitle>
 
 @inject ThemeService ThemeService
 @inject NoteKeepingDbContext DbContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NotebookStorageService StorageService
+@inject NavigationManager NavManager
 
+@inject IJSRuntime JS
+
+@if (JournalId.HasValue && notebook is null)
+{
+    <div class="journal-not-found">
+        <h1>Journal unavailable</h1>
+        <p>This journal could not be found or is not available to your account.</p>
+        <button class="journal-action primary" type="button" @onclick="NavigateToJournals">Journals</button>
+    </div>
+}
+else
+{
 <div class="theme-@Theme"
      style="background-color: @ThemeService.BgColor; color: @ThemeService.TextColor; font-family: 'Georgia', serif; transition: background-color 0.5s, color 0.5s;">
     <div class="journal-page-shell">
-        <header class="journal-header">
-            <div>
-                <h1 style="color: @ThemeService.AccentColor;">@(string.IsNullOrWhiteSpace(DisplayName) ? "Hello" :
-                                                                                $"Hello, {DisplayName}")</h1>
-                </div>
-                @*
+        <div class="logo">
+            <p>D</p>
+        </div>
+        <div class="journal-section journal-section-main">
+            <header class="journal-header">
+                <div>
+                    <h1 style="color: @ThemeService.AccentColor;">@JournalHeading</h1>
+                    </div>
+                    @*
                 <div class="journal-toolbar">
                     <button class="journal-action primary" type="button" @onclick="CreateNewNotebookAsync">
                         + New journal
                     </button>
 
                     <select class="theme-select" value="@Theme" @onchange="HandleThemeChange"
-                            style="background-color: @ThemeService.AccentColor !important; color: @ThemeService.TextColor !important;
+                            style="background-color: @ThemeService.AccentColor !important; color: @ThemeService.TextColor
+                !important;
             border: 2px solid @ThemeService.BorderColor;">
                         <option value="default">Default</option>
                         <option value="living">Living Room</option>
@@ -38,37 +57,55 @@
                         <option value="bedroom">Bedroom</option>
                     </select>
                 </div> *@
-            </header>
+                </header>
 
-            
-            <div class="journal-section journal-section-main">
                 @* <div class="journal-section-header">
                         <div>
                             <h2>@(notebook?.Title ?? "My Diary")</h2>
                         </div>
                     </div> *@
-                 
+
                 <div class="journal-card">
                     <div class="journal-date-container">
                         <div class="page-indicator">Page @notebook?.CurrentPage / @notebook?.TotalPages</div>
-                        <label for="date"></label>
-                        <input type="text" class="journal-date" placeholder="date" id="date"
-                               value="@DateTime.Today.ToString("MMM dd, yyyy")">
+                        <label for="date" class="visually-hidden">Page date</label>
+                        <input type="date" class="journal-date" id="date"
+                               aria-label="Edit page date"
+                               value="@(currentNote?.Date?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty)"
+                               @onchange="HandleDateChange" disabled="@(currentNote is null)">
                     </div>
                     <div class="progress-bar" aria-label="Notebook progress">
                         <span style="width: @NotebookProgress%"></span>
                     </div>
 
                     <label for="note-box"></label>
-                    <textarea class="journal-area @(isFirstPage ? "first-page-font" : "")" name="note" @bind="textValue"
-                              @bind:event="oninput" @bind:after="SaveOnTyping" @onkeydown="HandleNoteKeyDown"
-                              placeholder="Write Something Interesting" id="note-box"></textarea>
+                    <div class="journal-area @(isFirstPage ? "first-page-font" : "")" name="note" contenteditable="true"
+                         role="textbox" aria-multiline="true" data-placeholder="Write Something Interesting"
+                         @oninput="HandleEditorInput" @onkeydown="HandleNoteKeyDown" @ref="editorRef" id="note-box"></div>
+
+                    <div class="text-options">
+                        <div class="italic" role="button" tabindex="0" aria-label="Italic"
+                             @onmousedown:preventDefault="true" @onclick="ApplyItalic">
+                            <p>I</p>
+                        </div>
+                        <div class="bold" role="button" tabindex="0" aria-label="Bold" @onmousedown:preventDefault="true"
+                             @onclick="ApplyBold">
+                            <p>B</p>
+                        </div>
+                        <div class="underline" role="button" tabindex="0" aria-label="Underline"
+                             @onmousedown:preventDefault="true" @onclick="ApplyUnderline">
+                            <p>U</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="page-actions">
-                    <button class="journal-action primary submit-button">Journals</button>
-                    <button @onclick="PreviousPage" class="journal-action secondary" type="button">Previous</button>
-                    <button @onclick="NextPage" class="journal-action secondary" type="button">Next</button>
+                    <button class="journal-action primary submit-button" href="/journals"
+                            @onclick="NavigateToJournals">Journals</button>
+                    <button @onclick="HandlePreviousPageClick" @ref="previousPageButton" class="journal-action secondary"
+                            type="button" disabled="@(isNavigatingPage || isDatePromptOpen)">Previous</button>
+                    <button @onclick="HandleNextPageClick" @ref="nextPageButton" class="journal-action secondary"
+                            type="button" disabled="@(isNavigatingPage || isDatePromptOpen)">Next</button>
                     <button @onclick="HandleManualSave"
                             class="journal-action primary submit-button @(isSaved && hasManualSave ? "saved" : "")"
                             type="button" disabled="@isSaving">
@@ -76,6 +113,32 @@
                     </button>
                 </div>
             </div>
+
+            @if (isDatePromptOpen)
+            {
+                <div class="page-date-overlay" role="presentation">
+                    <section class="page-date-dialog" role="dialog" aria-modal="true" aria-labelledby="page-date-title">
+                        <h2 id="page-date-title">Choose a date for page @pendingPageNumber</h2>
+                        <p>Select today or choose a custom date for this page.</p>
+                        <button class="journal-action primary" type="button" @onclick="UseTodayForPendingPage"
+                                disabled="@isNavigatingPage">Use today</button>
+                        <div class="custom-page-date">
+                            <label for="custom-page-date-input">Custom date</label>
+                            <input id="custom-page-date-input" type="date" @bind="pendingCustomDate">
+                            <button class="journal-action secondary" type="button" @onclick="UseCustomDateForPendingPage"
+                                    disabled="@(isNavigatingPage || string.IsNullOrWhiteSpace(pendingCustomDate))">
+                                Use selected date
+                            </button>
+                        </div>
+                        @if (!string.IsNullOrEmpty(datePromptError))
+                        {
+                            <p class="page-date-error" role="alert">@datePromptError</p>
+                        }
+                        <button class="page-date-cancel" type="button" @onclick="CancelPageDatePrompt"
+                                disabled="@isNavigatingPage">Cancel</button>
+                    </section>
+                </div>
+            }
 
             @* <aside class="journal-section journal-section-side">
                     <div class="journal-section-header compact">
@@ -106,8 +169,19 @@
            
         </div>
     </div>
+}
 
 @code {
+
+    [Parameter]
+    public int? JournalId { get; set; }
+
+    private ElementReference editorRef;
+    private ElementReference previousPageButton;
+    private ElementReference nextPageButton;
+    private string JournalHeading => JournalId.HasValue
+        ? notebook?.Title ?? "Journal"
+        : string.IsNullOrWhiteSpace(DisplayName) ? "Hello" : $"Hello, {DisplayName}";
     private bool isFirstPage => notebook?.CurrentPage == 1;
     private string DisplayName { get; set; } = string.Empty;
     private double NotebookProgress => notebook is null || notebook.TotalPages <= 0
@@ -124,6 +198,51 @@
     private bool hasManualSave;
     private string? currentUserEmail;
     private bool hasLoadedAnonymousBrowserStorage;
+    private bool editorContentNeedsSync = true;
+    private bool hasLoadedRoute;
+    private int? loadedJournalId;
+    private bool isNavigatingPage;
+    private bool isDatePromptOpen;
+    private int pendingPageNumber;
+    private Note? pendingPageNote;
+    private string pendingCustomDate = string.Empty;
+    private string? datePromptError;
+
+    private async Task ApplyItalic()
+    {
+        await ApplyFormattingAsync("italic");
+    }
+
+    private async Task ApplyBold()
+    {
+        await ApplyFormattingAsync("bold");
+    }
+
+    private async Task ApplyUnderline()
+    {
+        await ApplyFormattingAsync("underline");
+    }
+
+    private async Task ApplyFormattingAsync(string format)
+    {
+        var result = await JS.InvokeAsync<string?>(
+            "formatContentEditableSelection", editorRef, format);
+
+        if (result == null)
+        {
+            return;
+        }
+
+        textValue = result;
+        await SaveNote();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleEditorInput()
+    {
+        textValue = await JS.InvokeAsync<string>("getContentEditableHtml", editorRef);
+        await SaveOnTyping();
+    }
 
     private async Task HandleThemeChange(ChangeEventArgs e)
     {
@@ -134,40 +253,78 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         AuthenticationStateProvider.AuthenticationStateChanged += HandleAuthenticationStateChanged;
-        await LoadNotebookForCurrentUserAsync();
         ThemeService.OnThemeChanged += OnThemeChangedHandler;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (hasLoadedRoute && loadedJournalId != JournalId && notebook is not null)
+        {
+            await SaveNote();
+        }
+
+        await LoadNotebookForCurrentUserAsync();
+        loadedJournalId = JournalId;
+        hasLoadedRoute = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || hasLoadedAnonymousBrowserStorage)
+        if (firstRender)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                hasLoadedAnonymousBrowserStorage = true;
+            }
+            else
+            {
+                hasLoadedAnonymousBrowserStorage = true;
+                if (!JournalId.HasValue)
+                {
+                    var storedNotebook = await StorageService.LoadNotebookAsync();
+                    if (storedNotebook != null)
+                    {
+                        notebook = storedNotebook;
+                        savedNotes = notebook.Notes.ToList();
+                        SetCurrentNote();
+                        await StorageService.SaveNotebookAsync(notebook);
+                        await InvokeAsync(StateHasChanged);
+                    }
+                    else if (notebook != null)
+                    {
+                        await StorageService.SaveNotebookAsync(notebook);
+                    }
+
+                    if (storedNotebook is null && isFirstPage)
+                    {
+                        textValue = "My Diary";
+                    }
+                }
+                else
+                {
+                    notebook = null;
+                    currentNote = null;
+                    textValue = string.Empty;
+                }
+            }
+        }
+
+        await SyncEditorContentAsync();
+    }
+
+    private async Task SyncEditorContentAsync()
+    {
+        if (!editorContentNeedsSync)
         {
             return;
         }
 
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == true)
-        {
-            hasLoadedAnonymousBrowserStorage = true;
-            return;
-        }
-
-        hasLoadedAnonymousBrowserStorage = true;
-        var storedNotebook = await StorageService.LoadNotebookAsync();
-        if (storedNotebook != null)
-        {
-            notebook = storedNotebook;
-            savedNotes = notebook.Notes.ToList();
-            SetCurrentNote();
-            await InvokeAsync(StateHasChanged);
-        }
-        else if (notebook != null)
-        {
-            await StorageService.SaveNotebookAsync(notebook);
-        }
+        editorContentNeedsSync = false;
+        await JS.InvokeVoidAsync("setContentEditableHtml", editorRef, textValue ?? string.Empty);
     }
 
     private async void HandleAuthenticationStateChanged(Task<AuthenticationState> task)
@@ -194,6 +351,12 @@
 
         if (user.Identity?.IsAuthenticated != true)
         {
+            if (JournalId.HasValue)
+            {
+                ClearNotebookState();
+                return;
+            }
+
             // Browser storage is loaded after interactive rendering in OnAfterRenderAsync.
             notebook = CreateNewNotebook(isAnonymous: true);
             DisplayName = string.Empty;
@@ -217,7 +380,13 @@
             DisplayName = email.Split('@')[0];
         }
 
-        notebook = await StorageService.LoadNotebookAsync();
+        notebook = await StorageService.LoadNotebookAsync(JournalId);
+
+        if (notebook is null && JournalId.HasValue)
+        {
+            ClearNotebookState();
+            return;
+        }
 
         if (notebook == null)
         {
@@ -245,7 +414,7 @@
             {
                 notebook.Notes.Add(new Note
                 {
-                    Date = DateTime.Today,
+                    Date = i == 0 ? DateTime.Today : null,
                     Text = string.Empty,
                     Notebook = notebook
                 });
@@ -258,6 +427,7 @@
 
         savedNotes = notebook.Notes.ToList();
         SetCurrentNote();
+        await StorageService.SaveNotebookAsync(notebook);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -266,9 +436,16 @@
         notebook = null;
         currentNote = null;
         textValue = string.Empty;
+        editorContentNeedsSync = true;
         savedNotes = new List<Note>();
         currentUserEmail = null;
         DisplayName = string.Empty;
+    }
+
+    private async Task NavigateToJournals()
+    {
+        await SaveNote();
+        NavManager.NavigateTo("/journals", forceLoad: false);
     }
 
     private void SetCurrentNote()
@@ -277,62 +454,213 @@
         {
             currentNote = null;
             textValue = string.Empty;
+            editorContentNeedsSync = true;
             return;
         }
 
-        if (notebook.Notes.Count == 0)
+        notebook.TotalPages = Math.Max(1, notebook.TotalPages);
+        notebook.CurrentPage = Math.Clamp(notebook.CurrentPage, 1, notebook.TotalPages);
+        var orderedNotes = notebook.Notes
+            .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
+            .ToList();
+        while (orderedNotes.Count < notebook.CurrentPage)
         {
-            currentNote = null;
-            textValue = string.Empty;
-            return;
+            var note = new Note
+            {
+                Date = orderedNotes.Count == 0 ? DateTime.Today : null,
+                NotebookId = notebook.Id,
+                Notebook = notebook
+            };
+            notebook.Notes.Add(note);
+            orderedNotes.Add(note);
         }
 
-        if (notebook.CurrentPage < 1)
+        currentNote = orderedNotes[notebook.CurrentPage - 1];
+        if (notebook.CurrentPage == 1 && currentNote.Date is null)
         {
-            notebook.CurrentPage = 1;
+            currentNote.Date = DateTime.Today;
         }
-
-        if (notebook.CurrentPage > notebook.TotalPages)
-        {
-            notebook.CurrentPage = notebook.TotalPages;
-        }
-
-        currentNote = notebook.Notes[notebook.CurrentPage - 1];
         textValue = currentNote?.Text ?? "";
+        editorContentNeedsSync = true;
     }
 
     public async Task NextPage()
     {
-        if (notebook == null)
+        if (notebook == null || isNavigatingPage || isDatePromptOpen)
         {
             return;
         }
 
-        if (notebook.CurrentPage < notebook.TotalPages)
+        if (notebook.CurrentPage >= notebook.TotalPages)
+        {
+            return;
+        }
+
+        isNavigatingPage = true;
+        try
         {
             hasManualSave = true;
             await SaveNote();
-            notebook.CurrentPage++;
-            await StorageService.SaveNotebookAsync(notebook);
+
+            var orderedNotes = notebook.Notes
+                .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
+                .ToList();
+            var targetPageNumber = notebook.CurrentPage + 1;
+            var targetIndex = targetPageNumber - 1;
+            var destinationNote = targetIndex < orderedNotes.Count
+                ? orderedNotes[targetIndex]
+                : new Note
+                {
+                    NotebookId = notebook.Id,
+                    Notebook = notebook
+                };
+            pendingPageNote = destinationNote;
+
+            if (destinationNote.Date is null)
+            {
+                pendingPageNumber = targetPageNumber;
+                pendingCustomDate = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                datePromptError = null;
+                isDatePromptOpen = true;
+                return;
+            }
+
+            notebook.CurrentPage = targetPageNumber;
             SetCurrentNote();
+            await StorageService.SaveNotebookAsync(notebook);
+        }
+        finally
+        {
+            isNavigatingPage = false;
         }
     }
 
     public async Task PreviousPage()
     {
-        if (notebook == null)
+        if (notebook == null || isNavigatingPage || isDatePromptOpen)
         {
             return;
         }
 
-        if (notebook.CurrentPage > 1)
+        if (notebook.CurrentPage <= 1)
+        {
+            return;
+        }
+
+        isNavigatingPage = true;
+        try
         {
             hasManualSave = true;
             await SaveNote();
             notebook.CurrentPage--;
-            await StorageService.SaveNotebookAsync(notebook);
             SetCurrentNote();
+            await StorageService.SaveNotebookAsync(notebook);
         }
+        finally
+        {
+            isNavigatingPage = false;
+        }
+    }
+
+    private async Task UseTodayForPendingPage()
+    {
+        await AssignPendingPageDateAsync(DateTime.Today);
+    }
+
+    private async Task UseCustomDateForPendingPage()
+    {
+        if (!DateTime.TryParseExact(
+                pendingCustomDate,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var selectedDate))
+        {
+            datePromptError = "Choose a valid date before continuing.";
+            return;
+        }
+
+        await AssignPendingPageDateAsync(selectedDate);
+    }
+
+    private async Task AssignPendingPageDateAsync(DateTime selectedDate)
+    {
+        if (notebook is null || pendingPageNote is null || !isDatePromptOpen || isNavigatingPage)
+        {
+            return;
+        }
+
+        isNavigatingPage = true;
+        try
+        {
+            if (!notebook.Notes.Contains(pendingPageNote))
+            {
+                notebook.Notes.Add(pendingPageNote);
+            }
+
+            pendingPageNote.Date = selectedDate.Date;
+            notebook.CurrentPage = pendingPageNumber;
+            SetCurrentNote();
+            await StorageService.SaveNotebookAsync(notebook);
+            ClosePageDatePrompt();
+        }
+        finally
+        {
+            isNavigatingPage = false;
+        }
+    }
+
+    private void CancelPageDatePrompt()
+    {
+        if (isNavigatingPage)
+        {
+            return;
+        }
+
+        ClosePageDatePrompt();
+    }
+
+    private void ClosePageDatePrompt()
+    {
+        isDatePromptOpen = false;
+        pendingPageNote = null;
+        pendingPageNumber = 0;
+        pendingCustomDate = string.Empty;
+        datePromptError = null;
+    }
+
+    private async Task HandleDateChange(ChangeEventArgs args)
+    {
+        if (currentNote is null || notebook is null || args.Value is not string value ||
+            !DateTime.TryParseExact(
+                value,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var selectedDate))
+        {
+            return;
+        }
+
+        if (currentNote.Date?.Date == selectedDate.Date)
+        {
+            return;
+        }
+
+        currentNote.Date = selectedDate.Date;
+        await StorageService.SaveNotebookAsync(notebook);
+    }
+
+    private async Task HandlePreviousPageClick()
+    {
+        await JS.InvokeVoidAsync("animateJournalPageButton", previousPageButton);
+        await PreviousPage();
+    }
+
+    private async Task HandleNextPageClick()
+    {
+        await JS.InvokeVoidAsync("animateJournalPageButton", nextPageButton);
+        await NextPage();
     }
 
     private Notebook CreateNewNotebook(bool isAnonymous = false)
@@ -350,7 +678,7 @@
         {
             newNotebook.Notes.Add(new Note
             {
-                Date = DateTime.Today,
+                Date = i == 0 ? DateTime.Today : null,
                 Text = string.Empty,
                 Notebook = newNotebook
             });

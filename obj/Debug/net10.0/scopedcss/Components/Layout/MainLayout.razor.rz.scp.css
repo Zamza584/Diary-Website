@@ -83,6 +83,13 @@ main[b-iysa7z3inu] {
    MOBILE RESPONSIVE (Up to 640px)
    ======================================== */
 @media (max-width: 640.98px) {
+  .sidebar[b-iysa7z3inu] {
+    position: absolute;
+    top: 31px;
+    right: 14px;
+    z-index: 20;
+  }
+
   .top-row[b-iysa7z3inu] {
     justify-content: space-between;
   }

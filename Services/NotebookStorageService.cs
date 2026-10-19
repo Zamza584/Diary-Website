@@ -36,17 +36,17 @@ public class NotebookStorageService
     /// For authenticated users: loads from database.
     /// For anonymous users: loads from browser localStorage.
     /// </summary>
-    public async Task<Notebook?> LoadNotebookAsync()
+    public async Task<Notebook?> LoadNotebookAsync(int? notebookId = null)
     {
         var isAuthenticated = await IsAuthenticatedAsync();
 
         if (isAuthenticated)
         {
-            return await LoadAuthenticatedNotebookAsync();
+            return await LoadAuthenticatedNotebookAsync(notebookId);
         }
         else
         {
-            return await LoadAnonymousNotebookAsync();
+            return notebookId.HasValue ? null : await LoadAnonymousNotebookAsync();
         }
     }
 
@@ -69,7 +69,6 @@ public class NotebookStorageService
         else
         {
             currentNote.Text = noteText;
-            currentNote.Date = DateTime.Today;
             await SaveNotebookToLocalStorageAsync(notebook);
         }
     }
@@ -131,7 +130,7 @@ public class NotebookStorageService
     /// <summary>
     /// Loads notebook for authenticated user from database.
     /// </summary>
-    private async Task<Notebook?> LoadAuthenticatedNotebookAsync()
+    private async Task<Notebook?> LoadAuthenticatedNotebookAsync(int? notebookId)
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -146,11 +145,18 @@ public class NotebookStorageService
         if (userAccount == null)
             return null;
 
-        var notebook = await _dbContext.Notebooks
+        IQueryable<Notebook> notebooks = _dbContext.Notebooks
             .Include(n => n.Notes)
-            .SingleOrDefaultAsync(n => n.UserAccountId == userAccount.Id);
+            .Where(n => n.UserAccountId == userAccount.Id);
 
-        return notebook;
+        if (notebookId.HasValue)
+        {
+            notebooks = notebooks.Where(n => n.Id == notebookId.Value);
+        }
+
+        return await notebooks
+            .OrderByDescending(n => n.Id)
+            .FirstOrDefaultAsync();
     }
 
     /// <summary>
@@ -180,7 +186,7 @@ public class NotebookStorageService
             {
                 notebook.Notes.Add(new Note
                 {
-                    Date = DateTime.Today,
+                    Date = null,
                     NotebookId = notebook.Id,
                     Notebook = notebook
                 });
@@ -258,13 +264,12 @@ public class NotebookStorageService
             var trackedNote = await _dbContext.Notes.FindAsync(currentNote.Id);
             if (trackedNote != null)
             {
-                currentNote.Text = noteText;
-                currentNote.Date = DateTime.Today;
+                trackedNote.Text = noteText;
+                trackedNote.Date = currentNote.Date;
             }
             else
             {
                 currentNote.Text = noteText;
-                currentNote.Date = DateTime.Today;
                 currentNote.Notebook = notebook;
                 currentNote.NotebookId = notebook.Id;
                 _dbContext.Notes.Attach(currentNote);
@@ -273,7 +278,6 @@ public class NotebookStorageService
         else
         {
             currentNote.Text = noteText;
-            currentNote.Date = DateTime.Today;
         }
 
         notebook.CurrentPage = Math.Clamp(notebook.CurrentPage, 1, notebook.TotalPages);
