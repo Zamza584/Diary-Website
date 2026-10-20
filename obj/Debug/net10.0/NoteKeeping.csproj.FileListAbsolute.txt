@@ -286,5 +286,5 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\NoteKeepin
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\ref\NoteKeeping.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-38bkrydohc-38bkrydohc.gz
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Pages\Journals.razor.rz.scp.css
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-dgtb7iaquq-dgtb7iaquq.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-dgtb7iaquq-dgtb7iaquq.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-adf8q2qrth-adf8q2qrth.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-adf8q2qrth-adf8q2qrth.gz

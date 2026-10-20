@@ -4,8 +4,8 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <div class="navigation @(isMenuOpen ? "open" : "")">
-    <button class="navbar-toggler" type="button" aria-label="Toggle navigation"
-            aria-expanded="@isMenuOpen" @onclick="ToggleMenu">
+    <button class="navbar-toggler" type="button" aria-label="Toggle navigation" aria-expanded="@isMenuOpen"
+            @onclick="ToggleMenu">
         <span></span>
         <span></span>
         <span></span>
@@ -22,8 +22,7 @@
                         <form method="post" action="/logout" class="d-block">
                             <input type="hidden" name="__RequestVerificationToken" value="@GetRequestToken()" />
                             <button type="submit"
-                                    class="nav-link btn btn-link text-start p-0 w-100 text-decoration-none"
-                                    style="color: inherit;">
+                                    class="nav-link btn btn-link text-start p-0 w-100 text-decoration-none">
                                 Logout
                             </button>
                         </form>
