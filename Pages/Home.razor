@@ -30,16 +30,16 @@
 }
 else
 {
-<div class="theme-@Theme"
-     style="background-color: @ThemeService.BgColor; color: @ThemeService.TextColor; font-family: 'Georgia', serif; transition: background-color 0.5s, color 0.5s;">
-    <div class="journal-page-shell">
-        <div class="logo">
-            <p>D</p>
-        </div>
-        <div class="journal-section journal-section-main">
-            <header class="journal-header">
-                <div>
-                    <h1 style="color: @ThemeService.AccentColor;">@JournalHeading</h1>
+    <div class="theme-@Theme"
+         style="background-color: @ThemeService.BgColor; color: @ThemeService.TextColor; font-family: 'Georgia', serif; transition: background-color 0.5s, color 0.5s;">
+        <div class="journal-page-shell">
+            <div class="logo">
+                <p>D</p>
+            </div>
+            <div class="journal-section journal-section-main">
+                <header class="journal-header">
+                    <div>
+                        <h1 style="color: @ThemeService.AccentColor;">@JournalHeading</h1>
                     </div>
                     @*
                 <div class="journal-toolbar">
@@ -69,10 +69,14 @@ else
                     <div class="journal-date-container">
                         <div class="page-indicator">Page @notebook?.CurrentPage / @notebook?.TotalPages</div>
                         <label for="date" class="visually-hidden">Page date</label>
-                        <input type="date" class="journal-date" id="date"
-                               aria-label="Edit page date"
-                               value="@(currentNote?.Date?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty)"
-                               @onchange="HandleDateChange" disabled="@(currentNote is null)">
+                        <div class="journal-date-input-container">
+                            <input @key="dateHighlightSequence" type="date"
+                                   class="journal-date @(dateHighlightSequence > 0 ? "date-highlight" : "")" id="date"
+                                   aria-label="Edit page date"
+                                   value="@(currentNote?.Date?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty)"
+                                   @onchange="HandleDateChange" disabled="@(currentNote is null)">
+                          
+                        </div>
                     </div>
                     <div class="progress-bar" aria-label="Notebook progress">
                         <span style="width: @NotebookProgress%"></span>
@@ -103,9 +107,9 @@ else
                     <button class="journal-action primary submit-button" href="/journals"
                             @onclick="NavigateToJournals">Journals</button>
                     <button @onclick="HandlePreviousPageClick" @ref="previousPageButton" class="journal-action secondary"
-                            type="button" disabled="@(isNavigatingPage || isDatePromptOpen)">Previous</button>
+                            type="button" disabled="@isNavigatingPage">Previous</button>
                     <button @onclick="HandleNextPageClick" @ref="nextPageButton" class="journal-action secondary"
-                            type="button" disabled="@(isNavigatingPage || isDatePromptOpen)">Next</button>
+                            type="button" disabled="@isNavigatingPage">Next</button>
                     <button @onclick="HandleManualSave"
                             class="journal-action primary submit-button @(isSaved && hasManualSave ? "saved" : "")"
                             type="button" disabled="@isSaving">
@@ -113,32 +117,6 @@ else
                     </button>
                 </div>
             </div>
-
-            @if (isDatePromptOpen)
-            {
-                <div class="page-date-overlay" role="presentation">
-                    <section class="page-date-dialog" role="dialog" aria-modal="true" aria-labelledby="page-date-title">
-                        <h2 id="page-date-title">Choose a date for page @pendingPageNumber</h2>
-                        <p>Select today or choose a custom date for this page.</p>
-                        <button class="journal-action primary" type="button" @onclick="UseTodayForPendingPage"
-                                disabled="@isNavigatingPage">Use today</button>
-                        <div class="custom-page-date">
-                            <label for="custom-page-date-input">Custom date</label>
-                            <input id="custom-page-date-input" type="date" @bind="pendingCustomDate">
-                            <button class="journal-action secondary" type="button" @onclick="UseCustomDateForPendingPage"
-                                    disabled="@(isNavigatingPage || string.IsNullOrWhiteSpace(pendingCustomDate))">
-                                Use selected date
-                            </button>
-                        </div>
-                        @if (!string.IsNullOrEmpty(datePromptError))
-                        {
-                            <p class="page-date-error" role="alert">@datePromptError</p>
-                        }
-                        <button class="page-date-cancel" type="button" @onclick="CancelPageDatePrompt"
-                                disabled="@isNavigatingPage">Cancel</button>
-                    </section>
-                </div>
-            }
 
             @* <aside class="journal-section journal-section-side">
                     <div class="journal-section-header compact">
@@ -202,11 +180,7 @@ else
     private bool hasLoadedRoute;
     private int? loadedJournalId;
     private bool isNavigatingPage;
-    private bool isDatePromptOpen;
-    private int pendingPageNumber;
-    private Note? pendingPageNote;
-    private string pendingCustomDate = string.Empty;
-    private string? datePromptError;
+    private int dateHighlightSequence;
 
     private async Task ApplyItalic()
     {
@@ -486,7 +460,7 @@ else
 
     public async Task NextPage()
     {
-        if (notebook == null || isNavigatingPage || isDatePromptOpen)
+        if (notebook == null || isNavigatingPage)
         {
             return;
         }
@@ -514,19 +488,14 @@ else
                     NotebookId = notebook.Id,
                     Notebook = notebook
                 };
-            pendingPageNote = destinationNote;
-
-            if (destinationNote.Date is null)
+            if (!notebook.Notes.Contains(destinationNote))
             {
-                pendingPageNumber = targetPageNumber;
-                pendingCustomDate = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                datePromptError = null;
-                isDatePromptOpen = true;
-                return;
+                notebook.Notes.Add(destinationNote);
             }
 
             notebook.CurrentPage = targetPageNumber;
             SetCurrentNote();
+            dateHighlightSequence++;
             await StorageService.SaveNotebookAsync(notebook);
         }
         finally
@@ -537,7 +506,7 @@ else
 
     public async Task PreviousPage()
     {
-        if (notebook == null || isNavigatingPage || isDatePromptOpen)
+        if (notebook == null || isNavigatingPage)
         {
             return;
         }
@@ -562,77 +531,21 @@ else
         }
     }
 
-    private async Task UseTodayForPendingPage()
-    {
-        await AssignPendingPageDateAsync(DateTime.Today);
-    }
-
-    private async Task UseCustomDateForPendingPage()
-    {
-        if (!DateTime.TryParseExact(
-                pendingCustomDate,
-                "yyyy-MM-dd",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out var selectedDate))
-        {
-            datePromptError = "Choose a valid date before continuing.";
-            return;
-        }
-
-        await AssignPendingPageDateAsync(selectedDate);
-    }
-
-    private async Task AssignPendingPageDateAsync(DateTime selectedDate)
-    {
-        if (notebook is null || pendingPageNote is null || !isDatePromptOpen || isNavigatingPage)
-        {
-            return;
-        }
-
-        isNavigatingPage = true;
-        try
-        {
-            if (!notebook.Notes.Contains(pendingPageNote))
-            {
-                notebook.Notes.Add(pendingPageNote);
-            }
-
-            pendingPageNote.Date = selectedDate.Date;
-            notebook.CurrentPage = pendingPageNumber;
-            SetCurrentNote();
-            await StorageService.SaveNotebookAsync(notebook);
-            ClosePageDatePrompt();
-        }
-        finally
-        {
-            isNavigatingPage = false;
-        }
-    }
-
-    private void CancelPageDatePrompt()
-    {
-        if (isNavigatingPage)
-        {
-            return;
-        }
-
-        ClosePageDatePrompt();
-    }
-
-    private void ClosePageDatePrompt()
-    {
-        isDatePromptOpen = false;
-        pendingPageNote = null;
-        pendingPageNumber = 0;
-        pendingCustomDate = string.Empty;
-        datePromptError = null;
-    }
-
     private async Task HandleDateChange(ChangeEventArgs args)
     {
-        if (currentNote is null || notebook is null || args.Value is not string value ||
-            !DateTime.TryParseExact(
+        if (currentNote is null || notebook is null || args.Value is not string value)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(value))
+        {
+            currentNote.Date = notebook.CurrentPage == 1 ? DateTime.Today : null;
+            await StorageService.SaveNotebookAsync(notebook);
+            return;
+        }
+
+        if (!DateTime.TryParseExact(
                 value,
                 "yyyy-MM-dd",
                 CultureInfo.InvariantCulture,

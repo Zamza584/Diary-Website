@@ -536,10 +536,11 @@ main[b-iysa7z3inu] {
 }
 
 .journal-section[b-ujv6ega1qq] {
-  width: 602px;
+  width: 700px;
   height: 637px;
   background: rgba(255, 255, 255, 0.9);
   margin: 70px auto 30px;
+  padding: 0 20px;
 }
 
 .journal-section-header[b-ujv6ega1qq] {
@@ -554,6 +555,10 @@ main[b-iysa7z3inu] {
 .journal-section-header h3[b-ujv6ega1qq] {
   margin: 6px 0 0;
   color: #1f1a17;
+}
+
+.journal-section > *[b-ujv6ega1qq] {
+  width: 600px;
 }
 
 .card-label[b-ujv6ega1qq] {
@@ -709,6 +714,10 @@ main[b-iysa7z3inu] {
   justify-content: space-between;
 }
 
+.journal-date-input-container[b-ujv6ega1qq] {
+  position: relative;
+}
+
 .journal-date[b-ujv6ega1qq] {
   border: none;
   margin: 1px;
@@ -720,11 +729,57 @@ main[b-iysa7z3inu] {
   font-size: 0.9rem;
 }
 
+.journal-date-placeholder[b-ujv6ega1qq] {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  padding: 0 2px;
+  background: #fff;
+  color: #504339;
+  font-size: 0.9rem;
+  font-weight: 600;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.visually-hidden[b-ujv6ega1qq] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.journal-date.date-highlight[b-ujv6ega1qq] {
+  animation: destinationDateHighlight-b-ujv6ega1qq 1.1s ease-out;
+}
+
+@keyframes destinationDateHighlight-b-ujv6ega1qq {
+  0% {
+    background-color: rgba(51, 101, 145, 0.65);
+    box-shadow: 0 0 0 4px rgba(15, 99, 163, 0.581);
+    transform: scale(1.04);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0 rgba(255, 191, 0, 0);
+    transform: scale(1);
+  }
+}
+
+.page-date-error[b-ujv6ega1qq] {
+  color: #7b1c1c;
+}
+
 .journal-area[b-ujv6ega1qq] {
   width: 100%;
   min-height: 200px;
-  height: 450px;
-  padding: 18px 18px 22px;
+  height: 478px;
+  padding: 18px 18px 18px;
   border: none;
   resize: none;
   background-color: rgba(255, 255, 255, 0.96);
@@ -817,7 +872,7 @@ main[b-iysa7z3inu] {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 888px) {
   .journal-page-shell[b-ujv6ega1qq] {
     box-sizing: border-box;
     flex-direction: column;
@@ -845,10 +900,15 @@ main[b-iysa7z3inu] {
     max-width: 602px;
     height: auto;
     margin: 24px auto 0;
+    padding: 0 0;
   }
 
   .journal-section-main[b-ujv6ega1qq] {
     min-width: 0;
+  }
+
+  .journal-section > *[b-ujv6ega1qq] {
+    width: 100%;
   }
 
   .journal-header[b-ujv6ega1qq] {

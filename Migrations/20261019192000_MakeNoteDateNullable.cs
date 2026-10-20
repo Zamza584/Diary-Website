@@ -1,14 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using NoteKeeping.Data;
 
 #nullable disable
 
 namespace NoteKeeping.Migrations
 {
-    [DbContext(typeof(NoteKeepingDbContext))]
-    [Migration("20261019192000_MakeNoteDateNullable")]
     public partial class MakeNoteDateNullable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
