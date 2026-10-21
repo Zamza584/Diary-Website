@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +13,24 @@ using NoteKeeping.Data;
 using NoteKeeping.Models;
 using NoteKeeping.Services;
 
+const string ExternalCookieScheme = "External";
+const string GoogleScheme = "Google";
+
 static CookieSecurePolicy GetSecureCookiePolicy(IWebHostEnvironment environment)
 {
     return environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+}
+
+static ClaimsPrincipal CreateUserPrincipal(UserAccount user)
+{
+    var claims = new List<Claim>
+    {
+        new(ClaimTypes.Name, user.Name),
+        new(ClaimTypes.Email, user.Email)
+    };
+
+    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    return new ClaimsPrincipal(identity);
 }
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,18 +77,44 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddScoped<NotebookStorageService>();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+var googleAuthenticationConfigured =
+    !string.IsNullOrWhiteSpace(googleClientId) &&
+    !string.IsNullOrWhiteSpace(googleClientSecret);
+
+var authenticationBuilder = builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
+authenticationBuilder.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/login";
+    options.AccessDeniedPath = "/login";
+    options.Cookie.Name = "NoteKeeping.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = GetSecureCookiePolicy(builder.Environment);
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+});
+
+if (googleAuthenticationConfigured)
+{
+    authenticationBuilder.AddCookie(ExternalCookieScheme, options =>
     {
-        options.LoginPath = "/login";
-        options.AccessDeniedPath = "/login";
-        options.Cookie.Name = "NoteKeeping.Auth";
+        options.Cookie.Name = "NoteKeeping.External";
         options.Cookie.HttpOnly = true;
         options.Cookie.IsEssential = true;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.SecurePolicy = GetSecureCookiePolicy(builder.Environment);
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
     });
+
+    authenticationBuilder.AddGoogle(GoogleScheme, options =>
+    {
+        options.ClientId = googleClientId!;
+        options.ClientSecret = googleClientSecret!;
+        options.SignInScheme = ExternalCookieScheme;
+    });
+}
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
@@ -151,6 +194,72 @@ app.UseRateLimiter();
 
 app.UseAntiforgery();
 
+app.MapGet("/auth/google", (IConfiguration configuration) =>
+{
+    var clientId = configuration["Authentication:Google:ClientId"];
+    var clientSecret = configuration["Authentication:Google:ClientSecret"];
+    if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+    {
+        return Results.Redirect("/login?error=google-not-configured");
+    }
+
+    var properties = new AuthenticationProperties
+    {
+        RedirectUri = "/auth/google-callback"
+    };
+
+    return Results.Challenge(properties, [GoogleScheme]);
+});
+
+app.MapGet("/auth/google-callback", async (HttpContext httpContext, NoteKeepingDbContext dbContext) =>
+{
+    var externalResult = await httpContext.AuthenticateAsync(ExternalCookieScheme);
+    await httpContext.SignOutAsync(ExternalCookieScheme);
+
+    if (!externalResult.Succeeded || externalResult.Principal is null)
+    {
+        return Results.Redirect("/login?error=google-failed");
+    }
+
+    var email = externalResult.Principal.FindFirstValue(ClaimTypes.Email)
+        ?? externalResult.Principal.FindFirstValue("email");
+    if (string.IsNullOrWhiteSpace(email))
+    {
+        return Results.Redirect("/login?error=google-email");
+    }
+
+    var normalizedEmail = email.Trim().ToLowerInvariant();
+    var user = await dbContext.UserAccounts
+        .SingleOrDefaultAsync(account => account.Email.ToLower() == normalizedEmail);
+
+    if (user is null)
+    {
+        var name = externalResult.Principal.FindFirstValue(ClaimTypes.Name);
+        user = new UserAccount
+        {
+            Name = string.IsNullOrWhiteSpace(name) ? normalizedEmail.Split('@')[0] : name,
+            Email = normalizedEmail,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(
+                Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        dbContext.UserAccounts.Add(user);
+        await dbContext.SaveChangesAsync();
+    }
+
+    await httpContext.SignInAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        CreateUserPrincipal(user),
+        new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
+    return Results.Redirect("/");
+});
+
 app.MapPost("/login", async (HttpContext httpContext, NoteKeepingDbContext dbContext, [FromForm] string email, [FromForm] string password) =>
 {
     if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
@@ -167,16 +276,7 @@ app.MapPost("/login", async (HttpContext httpContext, NoteKeepingDbContext dbCon
         return Results.Redirect("/login?error=invalid");
     }
 
-    var claims = new List<Claim>
-    {
-        new(ClaimTypes.Name, user.Name),
-        new(ClaimTypes.Email, user.Email)
-    };
-
-    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-    var principal = new ClaimsPrincipal(identity);
-
-    await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
+    await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, CreateUserPrincipal(user), new AuthenticationProperties
     {
         IsPersistent = true,
         ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)

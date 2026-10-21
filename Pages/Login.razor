@@ -48,6 +48,16 @@
                     <a class="auth-button auth-button-secondary" href="/register">Create account</a>
                 </div>
             </form>
+
+            <div class="auth-divider"><span>or</span></div>
+            <a class="auth-button auth-button-google" href="/auth/google">
+                <span class="google-mark" aria-hidden="true">G</span>
+                Continue with Google
+            </a>
+            <p class="auth-provider-hint">
+                Configure Google OAuth credentials and register your site's
+                <code>/signin-google</code> URL as an authorized redirect URI.
+            </p>
         </div>
     </div>
 </div>
@@ -67,6 +77,9 @@
             "missing" => "Please enter both email and password.",
             "invalid" => "Email or password is incorrect.",
             "rate-limited" => "Too many login attempts. Please wait a moment and try again.",
+            "google-not-configured" => "Google sign-in is not configured yet. Add your Google OAuth client ID and secret to the app configuration.",
+            "google-failed" => "Google sign-in could not be completed. Please try again.",
+            "google-email" => "Google did not provide a usable email address for this account.",
             _ => string.Empty
         };
     }
