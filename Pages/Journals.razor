@@ -3,6 +3,7 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.EntityFrameworkCore
 @using NoteKeeping.Models
 @using NoteKeeping.Data
@@ -23,18 +24,53 @@
     <section class="journal-grid" aria-label="Your journals">
         @foreach (var journal in journals)
         {
-            <NavLink class="journal-cover" href="@($"/journals/{journal.Id}")"
-                     aria-label="@($"Open {journal.Title}, dated {journal.Date:d}, {journal.TotalPages} pages")">
-                <div class="journal-cover-title">@journal.Title</div>
-            </NavLink>
+            <div class="journal-cover-item">
+                @if (editingJournalId == journal.Id)
+                {
+                    <div class="journal-cover-edit">
+                        <div class="journal-cover-title">
+                            <input class="journal-title-input" aria-label="Edit journal title"
+                                   @bind="editingTitle" @bind:event="oninput"
+                                   @onkeydown="HandleTitleKeyDownAsync" @onkeydown:stopPropagation="true" />
+                        </div>
+                    </div>
+                    <button class="journal-cover-action" type="button" aria-label="Save journal title"
+                            title="Save title" disabled="@isSavingTitle" @onclick="SaveTitleAsync">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m5 12 4 4L19 6" />
+                        </svg>
+                    </button>
+                }
+                else
+                {
+                    <NavLink class="journal-cover" href="@($"/journals/{journal.Id}")"
+                             aria-label="@($"Open {journal.Title}, dated {journal.Date:d}, {journal.TotalPages} pages")">
+                        <div class="journal-cover-title">@journal.Title</div>
+                    </NavLink>
+                    <button class="journal-cover-action" type="button" aria-label="@($"Edit {journal.Title} title")"
+                            title="Edit title" @onclick="() => BeginTitleEdit(journal)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m14 5 5 5M4 20l4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16 4 20Z" />
+                        </svg>
+                    </button>
+                }
+            </div>
         }
     </section>
+    @if (!string.IsNullOrWhiteSpace(titleEditError))
+    {
+        <p class="journal-edit-error" role="alert">@titleEditError</p>
+    }
 </main>
 
 @code {
     private List<Notebook> journals = new();
     private int? userAccountId;
     private bool isAddingJournal;
+    private int? editingJournalId;
+    private string editingTitle = string.Empty;
+    private string titleEditError = string.Empty;
+    private bool isSavingTitle;
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,6 +145,68 @@
         finally
         {
             isAddingJournal = false;
+        }
+    }
+
+    private void BeginTitleEdit(Notebook journal)
+    {
+        editingJournalId = journal.Id;
+        editingTitle = journal.Title;
+        titleEditError = string.Empty;
+    }
+
+    private async Task HandleTitleKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await SaveTitleAsync();
+        }
+        else if (args.Key == "Escape")
+        {
+            editingJournalId = null;
+            titleEditError = string.Empty;
+        }
+    }
+
+    private async Task SaveTitleAsync()
+    {
+        if (isSavingTitle || editingJournalId is null)
+        {
+            return;
+        }
+
+        var updatedTitle = editingTitle.Trim();
+        if (string.IsNullOrWhiteSpace(updatedTitle))
+        {
+            titleEditError = "A journal title can't be empty.";
+            return;
+        }
+
+        var journal = journals.SingleOrDefault(j => j.Id == editingJournalId.Value);
+        if (journal is null)
+        {
+            titleEditError = "This journal could not be found. Refresh the page and try again.";
+            return;
+        }
+
+        var previousTitle = journal.Title;
+        journal.Title = updatedTitle;
+        isSavingTitle = true;
+        titleEditError = string.Empty;
+
+        try
+        {
+            await DbContext.SaveChangesAsync();
+            editingJournalId = null;
+        }
+        catch (DbUpdateException)
+        {
+            journal.Title = previousTitle;
+            titleEditError = "The title couldn't be saved. Please try again.";
+        }
+        finally
+        {
+            isSavingTitle = false;
         }
     }
 }

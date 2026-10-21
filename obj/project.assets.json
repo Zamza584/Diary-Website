@@ -38,6 +38,22 @@
           "buildMultiTargeting/Microsoft.AspNetCore.App.Internal.Assets.targets": {}
         }
       },
+      "Microsoft.AspNetCore.Authentication.Google/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.Build.Framework/18.0.2": {
         "type": "package",
         "compile": {
@@ -885,6 +901,22 @@
         "buildTransitive/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "microsoft.aspnetcore.app.internal.assets.10.0.1.nupkg.sha512",
         "microsoft.aspnetcore.app.internal.assets.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.Google/10.0.11": {
+      "sha512": "v/OZld8HxGa5hudLWiChuCf5asMrE36n19sR1RK5cC65SGJoYvQAcwnz3yoAOLDSw90PYc3hgFCh1FW83sakUg==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.google/10.0.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net10.0/Microsoft.AspNetCore.Authentication.Google.dll",
+        "lib/net10.0/Microsoft.AspNetCore.Authentication.Google.xml",
+        "microsoft.aspnetcore.authentication.google.10.0.11.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.google.nuspec"
       ]
     },
     "Microsoft.Build.Framework/18.0.2": {
@@ -2462,6 +2494,7 @@
     "net10.0": [
       "BCrypt.Net-Next >= 4.0.3",
       "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.1",
+      "Microsoft.AspNetCore.Authentication.Google >= 10.0.11",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.11",
       "Microsoft.EntityFrameworkCore.Sqlite >= 10.0.11"
     ]
@@ -2518,6 +2551,10 @@
             "target": "Package",
             "version": "[10.0.1, )",
             "autoReferenced": true
+          },
+          "Microsoft.AspNetCore.Authentication.Google": {
+            "target": "Package",
+            "version": "[10.0.11, )"
           },
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",

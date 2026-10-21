@@ -34,8 +34,9 @@
 
 .logo[b-ujv6ega1qq] {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
+  transform: translateY(-50%);
   z-index: 10;
   align-self: center;
   background-color: #7b1c1c;
@@ -50,6 +51,15 @@
   padding: 0 0 0 30px;
   width: fit-content;
   line-height: 1.2;
+}
+
+@media (max-width: 1209.98px) {
+  .logo[b-ujv6ega1qq] {
+    top: 0;
+    right: 0;
+    left: auto;
+    transform: none;
+  }
 }
 
 .journal-page-shell[b-ujv6ega1qq] {
@@ -467,18 +477,6 @@
     padding: 16px 14px 28px;
   }
 
-  .logo[b-ujv6ega1qq] {
-    align-self: flex-start;
-    width: 100px;
-    height: 74px;
-    flex: 0 0 auto;
-  }
-
-  .logo p[b-ujv6ega1qq] {
-    padding-left: 20px;
-    font-size: 68px;
-  }
-
   .journal-section[b-ujv6ega1qq] {
     box-sizing: border-box;
     width: 100%;
@@ -581,5 +579,21 @@
     width: auto;
     min-width: 0;
     padding: 0.75rem 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .logo[b-ujv6ega1qq] {
+    position: static;
+    align-self: flex-start;
+    margin: 0;
+    transform: none;
+    width: 100px;
+    height: 74px;
+  }
+
+  .logo p[b-ujv6ega1qq] {
+    padding-left: 20px;
+    font-size: 68px;
   }
 }

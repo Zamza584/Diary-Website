@@ -5,17 +5,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
 
 :root {
-  --auth-bg: #f7f1e7;
-  --auth-panel: rgba(255, 255, 255, 0.76);
-  --auth-card-border: #e8dcc6;
-  --auth-shadow: rgba(71, 44, 19, 0.12);
-  --auth-text: #2f241d;
-  --auth-text-soft: #5f4d3c;
-  --auth-accent: #8a5a2b;
-  --auth-accent-strong: #6d4220;
-  --auth-accent-soft: #f4e8d6;
-  --auth-input-bg: #fffdf9;
-  --auth-input-border: #d9cab0;
+  --auth-bg: #f4f2f2;
+  --auth-panel: rgba(255, 255, 255, 0.9);
+  --auth-card-border: #d5dbea;
+  --auth-shadow: rgba(26, 41, 63, 0.1);
+  --auth-text: #1a293f;
+  --auth-text-soft: #4b586b;
+  --auth-accent: #325092;
+  --auth-accent-strong: #243d75;
+  --auth-accent-soft: #e8edf7;
+  --auth-input-bg: #ffffff;
+  --auth-input-border: #c7cfdf;
   --auth-success-bg: #edf9f1;
   --auth-success-border: #bce4c4;
   --auth-success-text: #1f5634;
@@ -88,8 +88,9 @@
   align-items: center;
   justify-content: center;
   padding: 32px 20px;
-  background: linear-gradient(180deg, var(--auth-bg) 0%, #f3eadb 100%);
+  background: linear-gradient(180deg, var(--auth-bg) 0%, #e9edf5 100%);
   color: var(--auth-text);
+  font-family: "Inria Serif", serif;
 }
 
 .auth-shell {
@@ -121,10 +122,10 @@
 
 .auth-header h1 {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 2.5rem);
+  font-size: clamp(2.6rem, 4vw, 3.2rem);
   line-height: 1.1;
   color: var(--auth-text);
-  font-family: "Inria Serif", serif;
+  font-family: "Imperial Script", cursive;
   letter-spacing: -0.04em;
   font-weight: 400;
   font-style: normal;
@@ -175,7 +176,7 @@
 .auth-input:focus {
   outline: none;
   border-color: var(--auth-accent);
-  box-shadow: 0 0 0 4px rgba(138, 90, 43, 0.12);
+  box-shadow: 0 0 0 4px rgba(50, 80, 146, 0.12);
 }
 
 .auth-link-row {
@@ -248,12 +249,12 @@
 .auth-button-primary {
   background: var(--auth-accent);
   color: #fff;
-  box-shadow: 0 10px 20px rgba(138, 90, 43, 0.18);
+  box-shadow: 0 10px 20px rgba(50, 80, 146, 0.18);
 }
 
 .auth-button-primary:hover {
   background: var(--auth-accent-strong);
-  box-shadow: 0 12px 24px rgba(109, 66, 32, 0.2);
+  box-shadow: 0 12px 24px rgba(36, 61, 117, 0.2);
 }
 
 .auth-button-secondary {
@@ -265,6 +266,51 @@
 .auth-button-secondary:hover {
   background: #efe0c8;
   text-decoration: none;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 16px;
+  color: var(--auth-text-soft);
+  font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--auth-card-border);
+}
+
+.auth-button-google {
+  width: 100%;
+  gap: 10px;
+  background: #fff;
+  border-color: var(--auth-card-border);
+  color: #30343b;
+}
+
+.auth-button-google:hover {
+  background: #f8f9fb;
+  box-shadow: 0 6px 16px rgba(35, 48, 75, 0.1);
+}
+
+.google-mark {
+  color: #4285f4;
+  font-family: Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.auth-provider-hint {
+  margin: 12px 0 0;
+  color: var(--auth-text-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
