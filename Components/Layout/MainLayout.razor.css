@@ -80,13 +80,13 @@ main {
 }
 
 /* ========================================
-   MOBILE RESPONSIVE (Up to 640px)
+   COLLAPSED NAVIGATION (Up to 880px)
    ======================================== */
-@media (max-width: 640.98px) {
+@media (max-width: 880.98px) {
   .sidebar {
     position: absolute;
-    top: 31px;
-    right: 14px;
+    top: 14px;
+    right: 16px;
     z-index: 20;
   }
 
@@ -101,9 +101,9 @@ main {
 }
 
 /* ========================================
-   DESKTOP RESPONSIVE (641px and up)
+   DESKTOP RESPONSIVE (881px and up)
    ======================================== */
-@media (min-width: 641px) {
+@media (min-width: 881px) {
   .page {
     flex-direction: row;
   }
