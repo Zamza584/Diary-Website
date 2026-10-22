@@ -16,44 +16,56 @@
 <main class="journal-library">
     <header class="journal-library-header">
         <h1>Journals</h1>
-        <button class="add-journal" type="button" @onclick="CreateJournalAsync" disabled="@isAddingJournal">
-            @(isAddingJournal ? "Adding..." : "Add Now")
-        </button>
+        <div class="journal-library-actions">
+            <span class="journal-count" aria-live="polite">
+                @journals.Count @(journals.Count == 1 ? "journal" : "journals")
+            </span>
+            <button class="add-journal" type="button" @onclick="OpenCreateJournalDialog" disabled="@isAddingJournal">
+                <span>Add New</span>
+            </button>
+        </div>
     </header>
 
     <section class="journal-grid" aria-label="Your journals">
         @foreach (var journal in journals)
         {
-            <div class="journal-cover-item">
-                @if (editingJournalId == journal.Id)
-                {
-                    <div class="journal-cover-edit">
-                        <div class="journal-cover-title">
-                            <input class="journal-title-input" aria-label="Edit journal title"
-                                   @bind="editingTitle" @bind:event="oninput"
-                                   @onkeydown="HandleTitleKeyDownAsync" @onkeydown:stopPropagation="true" />
+            <div class="journal-entry">
+                <div class="journal-cover-item">
+                    @if (editingJournalId == journal.Id)
+                    {
+                        <div class="journal-cover-edit">
+                            <div class="journal-cover-title journal-cover-title-editing" title="@editingTitle">
+                                <input class="journal-title-input" aria-label="Edit journal title"
+                                       @bind="editingTitle" @bind:event="oninput"
+                                       @onkeydown="HandleTitleKeyDownAsync" @onkeydown:stopPropagation="true" />
+                            </div>
                         </div>
-                    </div>
-                    <button class="journal-cover-action" type="button" aria-label="Save journal title"
-                            title="Save title" disabled="@isSavingTitle" @onclick="SaveTitleAsync">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="m5 12 4 4L19 6" />
-                        </svg>
-                    </button>
-                }
-                else
-                {
-                    <NavLink class="journal-cover" href="@($"/journals/{journal.Id}")"
-                             aria-label="@($"Open {journal.Title}, dated {journal.Date:d}, {journal.TotalPages} pages")">
-                        <div class="journal-cover-title">@journal.Title</div>
-                    </NavLink>
-                    <button class="journal-cover-action" type="button" aria-label="@($"Edit {journal.Title} title")"
-                            title="Edit title" @onclick="() => BeginTitleEdit(journal)">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="m14 5 5 5M4 20l4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16 4 20Z" />
-                        </svg>
-                    </button>
-                }
+                        <button class="journal-cover-action" type="button" aria-label="Save journal title"
+                                title="Save title" disabled="@isSavingTitle" @onclick="SaveTitleAsync">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m5 12 4 4L19 6" />
+                            </svg>
+                        </button>
+                    }
+                    else
+                    {
+                        <NavLink class="journal-cover" href="@($"/journals/{journal.Id}")"
+                                 aria-label="@($"Open {journal.Title}, dated {journal.Date:d}, {journal.TotalPages} pages")">
+                            <div class="journal-cover-title" title="@journal.Title">@journal.Title</div>
+                        </NavLink>
+                        <button class="journal-cover-action" type="button" aria-label="@($"Edit {journal.Title} title")"
+                                title="Edit title" @onclick="() => BeginTitleEdit(journal)">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m14 5 5 5M4 20l4.5-1 10.8-10.8a2.1 2.1 0 0 0-3-3L5.5 16 4 20Z" />
+                            </svg>
+                        </button>
+                    }
+                </div>
+                <button class="journal-delete-button" type="button"
+                        aria-label="@($"Delete {journal.Title}")" title="Delete journal"
+                        @onclick="() => OpenDeleteJournalDialog(journal)">
+                    Delete
+                </button>
             </div>
         }
     </section>
@@ -63,13 +75,68 @@
     }
 </main>
 
+@if (isCreateJournalDialogOpen)
+{
+    <div class="journal-dialog-overlay" @onclick="CloseCreateJournalDialog">
+        <section class="journal-dialog" role="dialog" aria-modal="true" aria-labelledby="create-journal-title"
+                 @onclick:stopPropagation="true">
+            <h2 id="create-journal-title">Create a journal</h2>
+            <label for="new-journal-title">Journal title</label>
+            <input id="new-journal-title" class="journal-dialog-input" autofocus @bind="newJournalTitle"
+                   @bind:event="oninput" @onkeydown="HandleCreateJournalKeyDownAsync"
+                   @onkeydown:stopPropagation="true" />
+            @if (!string.IsNullOrWhiteSpace(createJournalError))
+            {
+                <p class="journal-edit-error" role="alert">@createJournalError</p>
+            }
+            <div class="journal-dialog-actions">
+                <button class="journal-dialog-button secondary" type="button" @onclick="CloseCreateJournalDialog"
+                        disabled="@isAddingJournal">Cancel</button>
+                <button class="journal-dialog-button primary" type="button" @onclick="CreateJournalAsync"
+                        disabled="@isAddingJournal">
+                    @(isAddingJournal ? "Creating..." : "Create journal")
+                </button>
+            </div>
+        </section>
+    </div>
+}
+
+@if (pendingDeleteJournal is not null)
+{
+    <div class="journal-dialog-overlay" @onclick="CloseDeleteJournalDialog">
+        <section class="journal-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-journal-title"
+                 @onclick:stopPropagation="true">
+            <h2 id="delete-journal-title">Delete journal?</h2>
+            <p>Delete "@pendingDeleteJournal.Title" and all its pages?</p>
+            @if (!string.IsNullOrWhiteSpace(deleteJournalError))
+            {
+                <p class="journal-edit-error" role="alert">@deleteJournalError</p>
+            }
+            <div class="journal-dialog-actions">
+                <button class="journal-dialog-button secondary" type="button" @onclick="CloseDeleteJournalDialog"
+                        disabled="@isDeletingJournal">Cancel</button>
+                <button class="journal-dialog-button danger" type="button" @onclick="ConfirmDeleteJournalAsync"
+                        disabled="@isDeletingJournal">
+                    @(isDeletingJournal ? "Deleting..." : "Delete journal")
+                </button>
+            </div>
+        </section>
+    </div>
+}
+
 @code {
     private List<Notebook> journals = new();
     private int? userAccountId;
     private bool isAddingJournal;
+    private bool isCreateJournalDialogOpen;
+    private string newJournalTitle = "Diary";
+    private string createJournalError = string.Empty;
+    private Notebook? pendingDeleteJournal;
+    private bool isDeletingJournal;
     private int? editingJournalId;
     private string editingTitle = string.Empty;
     private string titleEditError = string.Empty;
+    private string deleteJournalError = string.Empty;
     private bool isSavingTitle;
 
     protected override async Task OnInitializedAsync()
@@ -101,15 +168,52 @@
         userAccountId = userAccount.Id;
         journals = await DbContext.Notebooks
             .Where(n => n.UserAccountId == userAccount.Id)
-            .OrderByDescending(n => n.Date)
-            .ThenByDescending(n => n.Id)
+            .OrderBy(n => n.Date)
+            .ThenBy(n => n.Id)
             .ToListAsync();
+    }
+
+    private void OpenCreateJournalDialog()
+    {
+        newJournalTitle = "Diary";
+        createJournalError = string.Empty;
+        isCreateJournalDialogOpen = true;
+    }
+
+    private void CloseCreateJournalDialog()
+    {
+        if (isAddingJournal)
+        {
+            return;
+        }
+
+        isCreateJournalDialogOpen = false;
+        createJournalError = string.Empty;
+    }
+
+    private async Task HandleCreateJournalKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await CreateJournalAsync();
+        }
+        else if (args.Key == "Escape")
+        {
+            CloseCreateJournalDialog();
+        }
     }
 
     private async Task CreateJournalAsync()
     {
         if (isAddingJournal)
         {
+            return;
+        }
+
+        var title = newJournalTitle.Trim();
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            createJournalError = "A journal title can't be empty.";
             return;
         }
 
@@ -124,7 +228,7 @@
         {
             var journal = new Notebook
             {
-                Title = "Diary",
+                Title = title,
                 Date = DateTime.Today,
                 CurrentPage = 1,
                 TotalPages = 20,
@@ -140,11 +244,67 @@
 
             DbContext.Notebooks.Add(journal);
             await DbContext.SaveChangesAsync();
-            journals.Insert(0, journal);
+            journals.Add(journal);
+            journals = journals.OrderBy(j => j.Date).ThenBy(j => j.Id).ToList();
+            isCreateJournalDialogOpen = false;
+            createJournalError = string.Empty;
+        }
+        catch (DbUpdateException)
+        {
+            createJournalError = "The journal couldn't be created. Please try again.";
         }
         finally
         {
             isAddingJournal = false;
+        }
+    }
+
+    private void OpenDeleteJournalDialog(Notebook journal)
+    {
+        pendingDeleteJournal = journal;
+        deleteJournalError = string.Empty;
+    }
+
+    private void CloseDeleteJournalDialog()
+    {
+        if (isDeletingJournal)
+        {
+            return;
+        }
+
+        pendingDeleteJournal = null;
+        deleteJournalError = string.Empty;
+    }
+
+    private async Task ConfirmDeleteJournalAsync()
+    {
+        if (isDeletingJournal || pendingDeleteJournal is null)
+        {
+            return;
+        }
+
+        var journal = pendingDeleteJournal;
+        isDeletingJournal = true;
+        DbContext.Notebooks.Remove(journal);
+        try
+        {
+            await DbContext.SaveChangesAsync();
+            journals.Remove(journal);
+            if (editingJournalId == journal.Id)
+            {
+                editingJournalId = null;
+            }
+            pendingDeleteJournal = null;
+            deleteJournalError = string.Empty;
+        }
+        catch (DbUpdateException)
+        {
+            DbContext.Entry(journal).State = EntityState.Unchanged;
+            deleteJournalError = "The journal couldn't be deleted. Please try again.";
+        }
+        finally
+        {
+            isDeletingJournal = false;
         }
     }
 
