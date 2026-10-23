@@ -810,6 +810,12 @@ main[b-iysa7z3inu] {
   margin: 0 0 0.75rem;
 }
 
+.journal-area h2[b-ujv6ega1qq] {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
 .journal-area:focus[b-ujv6ega1qq] {
   border: 1px solid rgb(0, 0, 0);
   border-radius: 10px;

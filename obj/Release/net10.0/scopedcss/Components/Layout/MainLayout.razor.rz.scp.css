@@ -1,0 +1,128 @@
+/* ========================================
+   PAGE LAYOUT - Main Container
+   ======================================== */
+.page[b-iysa7z3inu] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ========================================
+   MAIN CONTENT AREA
+   ======================================== */
+main[b-iysa7z3inu] {
+  flex: 1;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+.sidebar[b-iysa7z3inu] {
+  background-color: inherit;
+}
+
+/* ========================================
+   TOP ROW / HEADER
+   ======================================== */
+.top-row[b-iysa7z3inu] {
+  background-color: inherit;
+  border-bottom: 1px solid #d6d5d5;
+  justify-content: flex-end;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Top Row Links */
+.top-row[b-iysa7z3inu]  a,
+.top-row[b-iysa7z3inu]  .btn-link {
+  white-space: nowrap;
+  margin-left: 1.5rem;
+  text-decoration: none;
+}
+
+/* Top Row Link Hover State */
+.top-row[b-iysa7z3inu]  a:hover,
+.top-row[b-iysa7z3inu]  .btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Top Row First Link */
+.top-row[b-iysa7z3inu]  a:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========================================
+   BLAZOR ERROR UI
+   ======================================== */
+#blazor-error-ui[b-iysa7z3inu] {
+  color-scheme: light only;
+  background: lightyellow;
+  bottom: 0;
+  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  display: none;
+  left: 0;
+  padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Dismiss Button */
+#blazor-error-ui .dismiss[b-iysa7z3inu] {
+  cursor: pointer;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.5rem;
+}
+
+/* ========================================
+   COLLAPSED NAVIGATION (Up to 880px)
+   ======================================== */
+@media (max-width: 880.98px) {
+  .sidebar[b-iysa7z3inu] {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    z-index: 20;
+  }
+
+  .top-row[b-iysa7z3inu] {
+    justify-content: space-between;
+  }
+
+  .top-row[b-iysa7z3inu]  a,
+  .top-row[b-iysa7z3inu]  .btn-link {
+    margin-left: 0;
+  }
+}
+
+/* ========================================
+   DESKTOP RESPONSIVE (881px and up)
+   ======================================== */
+@media (min-width: 881px) {
+  .page[b-iysa7z3inu] {
+    flex-direction: row;
+  }
+
+  .sidebar[b-iysa7z3inu] {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+
+  .top-row[b-iysa7z3inu] {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .top-row.auth[b-iysa7z3inu]  a:first-child {
+    flex: 1;
+    text-align: right;
+    width: 0;
+  }
+}

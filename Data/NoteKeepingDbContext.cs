@@ -22,7 +22,9 @@ public class NoteKeepingDbContext : DbContext
         {
             entity.HasKey(n => n.Id);
             entity.Property(n => n.Title).IsRequired();
-            entity.Property(n => n.Date).IsRequired();
+            entity.Property(n => n.Date)
+                .HasColumnType("timestamp without time zone")
+                .IsRequired();
             entity.Property(n => n.CurrentPage).IsRequired();
             entity.Property(n => n.TotalPages).IsRequired();
 
@@ -36,6 +38,8 @@ public class NoteKeepingDbContext : DbContext
         {
             entity.HasKey(n => n.Id);
             entity.Property(n => n.Text).IsRequired();
+            entity.Property(n => n.Date)
+                .HasColumnType("timestamp without time zone");
             entity.HasOne(n => n.Notebook)
                 .WithMany(n => n.Notes)
                 .HasForeignKey(n => n.NotebookId)
@@ -49,7 +53,9 @@ public class NoteKeepingDbContext : DbContext
             entity.Property(u => u.Email).IsRequired();
             entity.HasIndex(u => u.Email).IsUnique();
             entity.Property(u => u.PasswordHash).IsRequired();
-            entity.Property(u => u.CreatedAt).IsRequired();
+            entity.Property(u => u.CreatedAt)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
         });
     }
 }

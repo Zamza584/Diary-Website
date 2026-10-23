@@ -1,0 +1,127 @@
+.navigation[b-zlgbdk1gca] {
+  display: none;
+}
+
+.navbar-toggler[b-zlgbdk1gca] {
+  display: none;
+}
+
+.navigation-links[b-zlgbdk1gca] {
+  display: block;
+}
+
+/* ========================================
+   TOP ROW / NAVBAR CONTAINER
+   ======================================== */
+.top-row[b-zlgbdk1gca] {
+  min-height: 3.5rem;
+  background-color: inherit;
+}
+
+/* ========================================
+   NAVIGATION ITEMS
+   ======================================== */
+
+.nav-item[b-zlgbdk1gca] {
+  font-size: 0.9rem;
+  padding-bottom: 0.5rem;
+}
+
+.nav-item:first-of-type[b-zlgbdk1gca] {
+  padding-top: 1rem;
+}
+
+.nav-item:last-of-type[b-zlgbdk1gca] {
+  padding-bottom: 1rem;
+}
+
+/* Navigation Links */
+.nav-item[b-zlgbdk1gca]  .nav-link {
+  color: white;
+  font-family: "Inknut Antiqua", serif;
+  background: #325092;
+  margin-top: 25px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 3rem;
+  border-radius: 8px;
+  width: 146px;
+  height: 56px;
+}
+
+/* Active Link State */
+.nav-item[b-zlgbdk1gca]  a.active {
+  background-color: rgba(88, 16, 16, 0.37);
+  color: white;
+  font-weight: bold;
+}
+
+/* Link Hover State */
+.nav-item[b-zlgbdk1gca]  .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 880px) {
+  .navigation[b-zlgbdk1gca] {
+    position: relative;
+    display: block;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+  }
+
+  .navbar-toggler[b-zlgbdk1gca] {
+    display: flex;
+    width: 44px;
+    height: 44px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    background-color: #325092;
+    cursor: pointer;
+  }
+
+  .navbar-toggler span[b-zlgbdk1gca] {
+    display: block;
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background-color: white;
+  }
+
+  .navigation-links[b-zlgbdk1gca] {
+    display: none;
+    position: absolute;
+    top: 52px;
+    right: 0;
+    width: 180px;
+    background-color: #1a293f;
+    border-radius: 8px;
+  }
+
+  .navigation.open .navigation-links[b-zlgbdk1gca] {
+    display: block;
+  }
+}
+
+@media (min-width: 881px) {
+  .navbar-toggler[b-zlgbdk1gca] {
+    display: none;
+  }
+  .navigation[b-zlgbdk1gca] {
+    display: block;
+    width: 180px;
+    height: 100vh;
+    background-color: #1a293f;
+  }
+}

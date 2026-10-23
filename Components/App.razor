@@ -55,13 +55,14 @@
                 const commands = {
                     italic: 'italic',
                     bold: 'bold',
-                    underline: 'underline'
+                    underline: 'underline',
+                    title: 'formatBlock'
                 };
                 const command = commands[format];
                 if (!command) return null;
 
                 element.focus();
-                document.execCommand(command, false);
+                document.execCommand(command, false, format === 'title' ? 'h2' : undefined);
                 return element.innerHTML;
             };
     </script>
