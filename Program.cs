@@ -33,7 +33,20 @@ static ClaimsPrincipal CreateUserPrincipal(UserAccount user)
     return new ClaimsPrincipal(identity);
 }
 
-var builder = WebApplication.CreateBuilder(args);
+string? sqliteImportPath = null;
+var applicationArgs = args;
+if (args.Length > 0 && args[0] == "--import-sqlite")
+{
+    if (args.Length != 2 || string.IsNullOrWhiteSpace(args[1]))
+    {
+        throw new ArgumentException("Usage: --import-sqlite <path-to-sqlite-database>");
+    }
+
+    sqliteImportPath = args[1];
+    applicationArgs = [];
+}
+
+var builder = WebApplication.CreateBuilder(applicationArgs);
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -42,28 +55,19 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-var configuredDatabasePath = builder.Configuration["Database:Path"];
-if (string.IsNullOrWhiteSpace(configuredDatabasePath))
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
 {
-    configuredDatabasePath = builder.Environment.IsDevelopment()
-        ? Path.Combine(builder.Environment.ContentRootPath, "App_Data", "NoteKeeping.db")
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NoteKeeping", "NoteKeeping.db");
+    throw new InvalidOperationException(
+        "Configure the PostgreSQL connection string using ConnectionStrings:DefaultConnection or the ConnectionStrings__DefaultConnection environment variable.");
 }
-
-var databaseDirectory = Path.GetDirectoryName(configuredDatabasePath);
-if (!string.IsNullOrWhiteSpace(databaseDirectory))
-{
-    Directory.CreateDirectory(databaseDirectory);
-}
-
-builder.Configuration["ConnectionStrings:DefaultConnection"] = $"Data Source={configuredDatabasePath}";
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddDbContext<NoteKeepingDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
@@ -158,6 +162,12 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<NoteKeepingDbContext>();
     dbContext.Database.Migrate();
+
+    if (sqliteImportPath is not null)
+    {
+        await SqliteToPostgresImporter.ImportAsync(dbContext, sqliteImportPath);
+        return;
+    }
 }
 
 // Configure the HTTP request pipeline.

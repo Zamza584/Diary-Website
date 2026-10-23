@@ -100,6 +100,10 @@ else
                              @onmousedown:preventDefault="true" @onclick="ApplyUnderline">
                             <p>U</p>
                         </div>
+                        <div class="title" role="button" tabindex="0" aria-label="Title"
+                             @onmousedown:preventDefault="true" @onclick="ApplyTitle">
+                            <p>T</p>
+                        </div>
                     </div>
                 </div>
 
@@ -195,6 +199,11 @@ else
     private async Task ApplyUnderline()
     {
         await ApplyFormattingAsync("underline");
+    }
+
+    private async Task ApplyTitle()
+    {
+        await ApplyFormattingAsync("title");
     }
 
     private async Task ApplyFormattingAsync(string format)
