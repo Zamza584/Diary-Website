@@ -19,13 +19,13 @@ build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v10.0
 build_property.RootNamespace = NoteKeeping
 build_property.RootNamespace = NoteKeeping
-build_property.ProjectDir = C:\Users\Jupiter\Documents\web-projects\NoteKeeping\
+build_property.ProjectDir = c:\Users\Jupiter\Documents\web-projects\NoteKeeping\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Jupiter\Documents\web-projects\NoteKeeping
+build_property.MSBuildProjectDirectory = c:\Users\Jupiter\Documents\web-projects\NoteKeeping
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Components/SeoMetadata.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTZW9NZXRhZGF0YS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/Error.razor]
@@ -73,6 +77,10 @@ build_metadata.AdditionalFiles.CssScope = b-zlgbdk1gca
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Components/Layout/ReconnectModal.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcUmVjb25uZWN0TW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-2lr7fnuged
+
+[C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/About.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWJvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-7bd0ovcj53
 
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==

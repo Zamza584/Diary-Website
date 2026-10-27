@@ -192,8 +192,6 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compress
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\3p547i15xu-{0}-13ja33weya-13ja33weya.gz
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\39q4v8842o-{0}-wmp8iwak4q-wmp8iwak4q.gz
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\ek9eqmu8kj-{0}-2lgipwaf5j-2lgipwaf5j.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\xlqxadhaja-{0}-znrpleghx3-znrpleghx3.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\osynb9spnz-{0}-znrpleghx3-znrpleghx3.gz
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\staticwebassets.build.json
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\staticwebassets.build.json.cache
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\staticwebassets.development.json
@@ -205,3 +203,6 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\refint\N
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\NoteKeeping.pdb
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\NoteKeeping.genruntimeconfig.cache
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\ref\NoteKeeping.dll
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\scopedcss\Pages\About.razor.rz.scp.css
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\xlqxadhaja-{0}-lrt8j7ab80-lrt8j7ab80.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Release\net10.0\compressed\osynb9spnz-{0}-lrt8j7ab80-lrt8j7ab80.gz

@@ -10,7 +10,11 @@
 @using System.Globalization
 
 
-<PageTitle>@(JournalId.HasValue ? notebook?.Title ?? "Journal unavailable" : "Notes")</PageTitle>
+<PageTitle>@(JournalId.HasValue ? notebook?.Title ?? "Journal unavailable" : "Comfidiario | Private Journal")
+</PageTitle>
+<SeoMetadata Title="@SeoTitle"
+             Description="A calm, private online diary for writing, organizing, and returning to your thoughts."
+             CanonicalPath="@SeoCanonicalPath" Robots="noindex, nofollow" />
 
 @inject ThemeService ThemeService
 @inject NoteKeepingDbContext DbContext
@@ -41,22 +45,17 @@ else
                     <div>
                         <h1 style="color: @ThemeService.AccentColor;">@JournalHeading</h1>
                     </div>
-                    @*
-                <div class="journal-toolbar">
-                    <button class="journal-action primary" type="button" @onclick="CreateNewNotebookAsync">
-                        + New journal
-                    </button>
-
-                    <select class="theme-select" value="@Theme" @onchange="HandleThemeChange"
-                            style="background-color: @ThemeService.AccentColor !important; color: @ThemeService.TextColor
-                !important;
-            border: 2px solid @ThemeService.BorderColor;">
-                        <option value="default">Default</option>
-                        <option value="living">Living Room</option>
-                        <option value="study">Study</option>
-                        <option value="bedroom">Bedroom</option>
-                    </select>
-                </div> *@
+                    @* <div class="journal-toolbar">
+                        <label class="theme-picker-label" for="journal-theme">Diary theme</label>
+                        <select id="journal-theme" class="theme-select" value="@Theme" @onchange="HandleThemeChange"
+                                style="background-color: @ThemeService.AccentColor; color: @ThemeService.TextColor;
+                                       border: 2px solid @ThemeService.BorderColor;">
+                            <option value="default">Classic</option>
+                            <option value="living">Living Room</option>
+                            <option value="study">Study</option>
+                            <option value="bedroom">Bedroom</option>
+                        </select>
+                    </div> *@
                 </header>
 
                 @* <div class="journal-section-header">
@@ -67,7 +66,14 @@ else
 
                 <div class="journal-card">
                     <div class="journal-date-container">
-                        <div class="page-indicator">Page @notebook?.CurrentPage / @notebook?.TotalPages</div>
+                        <div class="page-indicator">
+                            <label for="page-number">Page</label>
+                            <input id="page-number" class="page-number-input" type="number" min="1"
+                                   max="@(notebook?.TotalPages ?? 1)" value="@(notebook?.CurrentPage ?? 1)"
+                                   aria-label="Go to page" disabled="@(notebook is null || isNavigatingPage)"
+                                   @onchange="HandlePageNumberChange" />
+                            <span>/ @notebook?.TotalPages</span>
+                        </div>
                         <label for="date" class="visually-hidden">Page date</label>
                         <div class="journal-date-input-container">
                             <input @key="dateHighlightSequence" type="date"
@@ -100,8 +106,8 @@ else
                              @onmousedown:preventDefault="true" @onclick="ApplyUnderline">
                             <p>U</p>
                         </div>
-                        <div class="title" role="button" tabindex="0" aria-label="Title"
-                             @onmousedown:preventDefault="true" @onclick="ApplyTitle">
+                        <div class="title" role="button" tabindex="0" aria-label="Title" @onmousedown:preventDefault="true"
+                             @onclick="ApplyTitle">
                             <p>T</p>
                         </div>
                     </div>
@@ -161,6 +167,8 @@ else
     private ElementReference editorRef;
     private ElementReference previousPageButton;
     private ElementReference nextPageButton;
+    private string SeoTitle => JournalId.HasValue ? "Private journal | NoteKeeping" : "Private notes | NoteKeeping";
+    private string SeoCanonicalPath => JournalId.HasValue ? $"/journals/{JournalId.Value}" : "/";
     private string JournalHeading => JournalId.HasValue
         ? notebook?.Title ?? "Journal"
         : string.IsNullOrWhiteSpace(DisplayName) ? "Hello" : $"Hello, {DisplayName}";
@@ -272,6 +280,14 @@ else
                     if (storedNotebook != null)
                     {
                         notebook = storedNotebook;
+                        var firstNote = notebook.Notes
+                            .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
+                            .FirstOrDefault();
+                        if (firstNote is not null && string.IsNullOrWhiteSpace(firstNote.Text))
+                        {
+                            firstNote.Text = "Journal";
+                        }
+
                         savedNotes = notebook.Notes.ToList();
                         SetCurrentNote();
                         await StorageService.SaveNotebookAsync(notebook);
@@ -282,10 +298,6 @@ else
                         await StorageService.SaveNotebookAsync(notebook);
                     }
 
-                    if (storedNotebook is null && isFirstPage)
-                    {
-                        textValue = "My Diary";
-                    }
                 }
                 else
                 {
@@ -307,7 +319,11 @@ else
         }
 
         editorContentNeedsSync = false;
-        await JS.InvokeVoidAsync("setContentEditableHtml", editorRef, textValue ?? string.Empty);
+        await JS.InvokeVoidAsync(
+            "setContentEditableHtml",
+            editorRef,
+            textValue ?? string.Empty,
+            isFirstPage);
     }
 
     private async void HandleAuthenticationStateChanged(Task<AuthenticationState> task)
@@ -341,7 +357,7 @@ else
             }
 
             // Browser storage is loaded after interactive rendering in OnAfterRenderAsync.
-            notebook = CreateNewNotebook(isAnonymous: true);
+            notebook = CreateNewNotebook();
             DisplayName = string.Empty;
             currentUserEmail = null;
             savedNotes = notebook.Notes.ToList();
@@ -540,6 +556,34 @@ else
         }
     }
 
+    private async Task HandlePageNumberChange(ChangeEventArgs args)
+    {
+        if (notebook is null ||
+            isNavigatingPage ||
+            !int.TryParse(args.Value?.ToString(), NumberStyles.None, CultureInfo.InvariantCulture, out var targetPage) ||
+            targetPage < 1 ||
+            targetPage > notebook.TotalPages ||
+            targetPage == notebook.CurrentPage)
+        {
+            return;
+        }
+
+        isNavigatingPage = true;
+        try
+        {
+            hasManualSave = true;
+            await SaveNote();
+            notebook.CurrentPage = targetPage;
+            SetCurrentNote();
+            dateHighlightSequence++;
+            await StorageService.SaveNotebookAsync(notebook);
+        }
+        finally
+        {
+            isNavigatingPage = false;
+        }
+    }
+
     private async Task HandleDateChange(ChangeEventArgs args)
     {
         if (currentNote is null || notebook is null || args.Value is not string value)
@@ -585,7 +629,7 @@ else
         await NextPage();
     }
 
-    private Notebook CreateNewNotebook(bool isAnonymous = false)
+    private Notebook CreateNewNotebook()
     {
         var newNotebook = new Notebook
         {
@@ -606,10 +650,7 @@ else
             });
         }
 
-        if (!isAnonymous)
-        {
-            newNotebook.Notes[0].Text = "Journal";
-        }
+        newNotebook.Notes[0].Text = "Journal";
 
         return newNotebook;
     }
@@ -622,7 +663,7 @@ else
         if (isAuthenticated)
         {
             // Authenticated: save to database
-            var newNotebook = CreateNewNotebook(isAnonymous: false);
+            var newNotebook = CreateNewNotebook();
             var email = authState.User.FindFirstValue(ClaimTypes.Email) ?? authState.User.Identity?.Name ?? string.Empty;
             var userAccount = await DbContext.UserAccounts
                 .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
@@ -642,7 +683,7 @@ else
         else
         {
             // Anonymous: save to localStorage
-            var newNotebook = CreateNewNotebook(isAnonymous: true);
+            var newNotebook = CreateNewNotebook();
             await StorageService.SaveNotebookAsync(newNotebook);
 
             notebook = newNotebook;
@@ -726,11 +767,11 @@ else
 
     async Task HandleNoteKeyDown(KeyboardEventArgs e)
     {
-        if (e.CtrlKey && e.Key == "ArrowRight")
+        if (e.CtrlKey && e.AltKey && e.Key == "ArrowRight")
         {
             await NextPage();
         }
-        else if (e.CtrlKey && e.Key == "ArrowLeft")
+        else if (e.CtrlKey && e.AltKey && e.Key == "ArrowLeft")
         {
             await PreviousPage();
         }

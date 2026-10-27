@@ -51,6 +51,10 @@
   height: 56px;
 }
 
+.nav-item[b-zlgbdk1gca]  .nav-about-link {
+  margin-left: auto;
+}
+
 /* Active Link State */
 .nav-item[b-zlgbdk1gca]  a.active {
   background-color: rgba(88, 16, 16, 0.37);

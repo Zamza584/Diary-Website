@@ -288,5 +288,6 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Microsoft.
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-y0y8cns7b8-y0y8cns7b8.gz
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Npgsql.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-vlm2jtny8d-vlm2jtny8d.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-vlm2jtny8d-vlm2jtny8d.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Pages\About.razor.rz.scp.css
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-h9nu36s13j-h9nu36s13j.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-h9nu36s13j-h9nu36s13j.gz
