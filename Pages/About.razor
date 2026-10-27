@@ -1,0 +1,81 @@
+@page "/about"
+@using NoteKeeping.Services
+@inject ThemeService ThemeService
+
+<PageTitle>About Comfidiario | A softer place to land</PageTitle>
+<SeoMetadata Title="About Comfidiario | A softer place to land"
+             Description="Meet Comfidiario: a calm, private journal for making room for your thoughts, one page at a time."
+             CanonicalPath="/about" />
+
+<main class="about-page">
+    <div class="about-orb about-orb-one" aria-hidden="true"></div>
+    <div class="about-orb about-orb-two" aria-hidden="true"></div>
+
+    <section class="about-hero" aria-labelledby="about-title">
+        <p class="about-eyebrow"><span aria-hidden="true">✦</span> A little room for you</p>
+        <h1 id="about-title">Comfidiario</h1>
+        <p class="about-tagline">Your thoughts deserve a softer place to land.</p>
+        <p class="about-intro">
+            Life can be loud. Comfidiario is a quiet corner to pause, untangle what is on your mind,
+            and keep the moments you do not want to lose. No perfect words required. Just you, and a fresh page.
+        </p>
+        <div class="about-hero-actions">
+            <a class="about-button primary" href="/">Open your diary <span aria-hidden="true">→</span></a>
+            <a class="about-button secondary" href="/register">Make it yours</a>
+        </div>
+        <div class="about-scroll-cue" aria-hidden="true"><span></span> Take a little look</div>
+    </section>
+
+    <section class="about-story" aria-labelledby="about-story-title">
+        <div class="about-section-heading">
+            <p class="about-eyebrow">Small pages. Big exhale.</p>
+            <h2 id="about-story-title">A diary that meets you where you are.</h2>
+        </div>
+        <div class="about-feature-grid">
+            <article class="about-feature-card">
+                <span class="about-feature-icon" aria-hidden="true">☁</span>
+                <h3>Let it out</h3>
+                <p>Write a sentence, a whole story, or whatever today needs. Your pages are ready whenever you are.</p>
+            </article>
+            <article class="about-feature-card">
+                <span class="about-feature-icon" aria-hidden="true">⌁</span>
+                <h3>Make it feel like yours</h3>
+                <p>Choose Classic, Living Room, Study, or Bedroom to give your diary the mood that fits your moment.</p>
+            </article>
+            <article class="about-feature-card">
+                <span class="about-feature-icon" aria-hidden="true">✧</span>
+                <h3>Keep the little things</h3>
+                <p>Move through pages, add dates, and come back to your thoughts when you feel like looking back.</p>
+            </article>
+        </div>
+    </section>
+
+
+    <section class="about-privacy" aria-labelledby="about-privacy-title">
+        <div class="about-privacy-mark" aria-hidden="true">♡</div>
+        <div>
+            <p class="about-eyebrow">A note on privacy</p>
+            <h2 id="about-privacy-title">Your inner world is yours.</h2>
+            <p>
+                For signed-in journals, note text and journal titles are encrypted before they are stored
+                in the database. Your writing is personal; it should be treated that way.
+            </p>
+        </div>
+    </section>
+
+    <footer class="about-footer">
+        <p>Thanks for making a little space for yourself.</p>
+        <a class="about-donate-link" href="/donate">Support Comfidiario <span aria-hidden="true">↗</span></a>
+        <small>Donate page coming later · For now, keep writing.</small>
+    </footer>
+</main>
+
+@code {
+    private async Task HandleThemeChange(ChangeEventArgs args)
+    {
+        if (args.Value is string theme)
+        {
+            await ThemeService.SetTheme(theme);
+        }
+    }
+}

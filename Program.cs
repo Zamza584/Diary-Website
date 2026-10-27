@@ -4,6 +4,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +67,25 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+var dataProtectionKeyDirectory = builder.Configuration["DataProtection:KeysPath"];
+if (string.IsNullOrWhiteSpace(dataProtectionKeyDirectory))
+{
+    dataProtectionKeyDirectory = Path.Combine(
+        builder.Environment.ContentRootPath,
+        "App_Data",
+        "DataProtection-Keys");
+}
+else if (!Path.IsPathRooted(dataProtectionKeyDirectory))
+{
+    dataProtectionKeyDirectory = Path.Combine(
+        builder.Environment.ContentRootPath,
+        dataProtectionKeyDirectory);
+}
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("NoteKeeping")
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeyDirectory));
+
 builder.Services.AddDbContext<NoteKeepingDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -81,6 +101,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddScoped<NotebookStorageService>();
+builder.Services.AddSingleton<NoteTextEncryption>();
+builder.Services.AddSingleton<NotebookTitleEncryption>();
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 var googleAuthenticationConfigured =
@@ -122,7 +144,7 @@ if (googleAuthenticationConfigured)
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddSingleton<ThemeService>();
+builder.Services.AddScoped<ThemeService>();
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -166,6 +188,18 @@ using (var scope = app.Services.CreateScope())
     if (sqliteImportPath is not null)
     {
         await SqliteToPostgresImporter.ImportAsync(dbContext, sqliteImportPath);
+    }
+
+    await NoteTextEncryptionMigration.EncryptLegacyNotesAsync(
+        dbContext,
+        scope.ServiceProvider.GetRequiredService<NoteTextEncryption>());
+
+    await NotebookTitleEncryptionMigration.EncryptLegacyTitlesAsync(
+        dbContext,
+        scope.ServiceProvider.GetRequiredService<NotebookTitleEncryption>());
+
+    if (sqliteImportPath is not null)
+    {
         return;
     }
 }

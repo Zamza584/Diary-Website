@@ -35,12 +35,40 @@
             };
 
             window.getContentEditableHtml = (element) => {
-                return element ? element.innerHTML : '';
+                if (!element) return '';
+
+                const title = element.firstElementChild;
+                if (element.childElementCount === 1 &&
+                    title.classList.contains('journal-title-aurora') &&
+                    title.textContent === 'Journal') {
+                    return 'Journal';
+                }
+
+                return element.innerHTML;
             };
 
-            window.setContentEditableHtml = (element, html) => {
+            window.setContentEditableHtml = (element, html, isFirstPage) => {
                 if (!element) return;
-                element.innerHTML = html || '';
+
+                const content = html || '';
+                if (isFirstPage && content === 'Journal') {
+                    element.innerHTML = '<span class="journal-title-aurora">Journal</span>';
+
+                    const title = element.firstElementChild;
+                    if (window.gsap) {
+                        window.gsap.killTweensOf(title);
+                        window.gsap.fromTo(title, { backgroundPosition: '0% 50%' }, {
+                            backgroundPosition: '100% 50%',
+                            duration: 5,
+                            repeat: -1,
+                            yoyo: true,
+                            ease: 'none'
+                        });
+                    }
+                    return;
+                }
+
+                element.innerHTML = content;
             };
 
             window.formatContentEditableSelection = (element, format) => {

@@ -1,13 +1,23 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NoteKeeping.Models;
+using NoteKeeping.Services;
 
 namespace NoteKeeping.Data;
 
 public class NoteKeepingDbContext : DbContext
 {
-    public NoteKeepingDbContext(DbContextOptions<NoteKeepingDbContext> options)
+    private readonly NoteTextEncryption _noteTextEncryption;
+    private readonly NotebookTitleEncryption _notebookTitleEncryption;
+
+    public NoteKeepingDbContext(
+        DbContextOptions<NoteKeepingDbContext> options,
+        NoteTextEncryption noteTextEncryption,
+        NotebookTitleEncryption notebookTitleEncryption)
         : base(options)
     {
+        _noteTextEncryption = noteTextEncryption;
+        _notebookTitleEncryption = notebookTitleEncryption;
     }
 
     public DbSet<Notebook> Notebooks => Set<Notebook>();
@@ -17,11 +27,17 @@ public class NoteKeepingDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        var noteTextEncryption = _noteTextEncryption;
+        var notebookTitleEncryption = _notebookTitleEncryption;
 
         modelBuilder.Entity<Notebook>(entity =>
         {
             entity.HasKey(n => n.Id);
-            entity.Property(n => n.Title).IsRequired();
+            entity.Property(n => n.Title)
+                .HasConversion(new ValueConverter<string, string>(
+                    title => notebookTitleEncryption.Encrypt(title),
+                    title => notebookTitleEncryption.Decrypt(title)))
+                .IsRequired();
             entity.Property(n => n.Date)
                 .HasColumnType("timestamp without time zone")
                 .IsRequired();
@@ -37,7 +53,11 @@ public class NoteKeepingDbContext : DbContext
         modelBuilder.Entity<Note>(entity =>
         {
             entity.HasKey(n => n.Id);
-            entity.Property(n => n.Text).IsRequired();
+            entity.Property(n => n.Text)
+                .HasConversion(new ValueConverter<string, string>(
+                    text => noteTextEncryption.Encrypt(text),
+                    text => noteTextEncryption.Decrypt(text)))
+                .IsRequired();
             entity.Property(n => n.Date)
                 .HasColumnType("timestamp without time zone");
             entity.HasOne(n => n.Notebook)
