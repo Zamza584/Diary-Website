@@ -15,6 +15,7 @@ secrets*.json
 *.p12
 id_rsa
 id_ed25519
+/App_Data/DataProtection-Keys/
 
 # .NET build output and IDE state
 [Bb]in/
@@ -32,7 +33,5 @@ appsettings.Development.json
 *.db-*
 *.sqlite
 *.sqlite3
-
-services/DataProtectionKeyRingMigration.cs
 
 DATABASE.md
