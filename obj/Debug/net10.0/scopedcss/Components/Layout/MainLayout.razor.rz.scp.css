@@ -80,13 +80,13 @@ main[b-iysa7z3inu] {
 }
 
 /* ========================================
-   COLLAPSED NAVIGATION (Up to 880px)
+   MOBILE RESPONSIVE (Up to 640px)
    ======================================== */
-@media (max-width: 880.98px) {
+@media (max-width: 640.98px) {
   .sidebar[b-iysa7z3inu] {
     position: absolute;
-    top: 14px;
-    right: 16px;
+    top: 31px;
+    right: 14px;
     z-index: 20;
   }
 
@@ -101,9 +101,9 @@ main[b-iysa7z3inu] {
 }
 
 /* ========================================
-   DESKTOP RESPONSIVE (881px and up)
+   DESKTOP RESPONSIVE (641px and up)
    ======================================== */
-@media (min-width: 881px) {
+@media (min-width: 641px) {
   .page[b-iysa7z3inu] {
     flex-direction: row;
   }

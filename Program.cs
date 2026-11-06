@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.RateLimiting;
+using Azure.Core;
+using Azure.Extensions.AspNetCore.DataProtection.Blobs;
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -34,8 +37,30 @@ static ClaimsPrincipal CreateUserPrincipal(UserAccount user)
     return new ClaimsPrincipal(identity);
 }
 
+static DirectoryInfo GetDataProtectionKeyDirectory(
+    IConfiguration configuration,
+    IWebHostEnvironment environment)
+{
+    var keyDirectoryPath = configuration["DataProtection:KeysPath"];
+    if (string.IsNullOrWhiteSpace(keyDirectoryPath))
+    {
+        keyDirectoryPath = Path.Combine(
+            environment.ContentRootPath,
+            "App_Data",
+            "DataProtection-Keys");
+    }
+    else if (!Path.IsPathRooted(keyDirectoryPath))
+    {
+        keyDirectoryPath = Path.Combine(environment.ContentRootPath, keyDirectoryPath);
+    }
+
+    return new DirectoryInfo(keyDirectoryPath);
+}
+
 string? sqliteImportPath = null;
 var applicationArgs = args;
+string? dataProtectionCommand = null;
+string? dataProtectionBlobUriArgument = null;
 if (args.Length > 0 && args[0] == "--import-sqlite")
 {
     if (args.Length != 2 || string.IsNullOrWhiteSpace(args[1]))
@@ -44,6 +69,19 @@ if (args.Length > 0 && args[0] == "--import-sqlite")
     }
 
     sqliteImportPath = args[1];
+    applicationArgs = [];
+}
+else if (args.Length > 0 &&
+         args[0] is "--migrate-data-protection-key-ring" or "--validate-data-protection-key-ring")
+{
+    if (args.Length != 2 || string.IsNullOrWhiteSpace(args[1]))
+    {
+        throw new ArgumentException(
+            $"Usage: {args[0]} <https-blob-uri>");
+    }
+
+    dataProtectionCommand = args[0];
+    dataProtectionBlobUriArgument = args[1];
     applicationArgs = [];
 }
 
@@ -56,6 +94,30 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
+if (dataProtectionCommand is not null)
+{
+    if (!Uri.TryCreate(dataProtectionBlobUriArgument, UriKind.Absolute, out var migrationBlobUri))
+    {
+        throw new ArgumentException("The Azure Data Protection key repository URI is not valid.");
+    }
+
+    if (dataProtectionCommand == "--migrate-data-protection-key-ring")
+    {
+        await DataProtectionKeyRingMigration.MigrateAsync(
+            GetDataProtectionKeyDirectory(builder.Configuration, builder.Environment),
+            migrationBlobUri);
+    }
+    else
+    {
+        await DataProtectionKeyRingMigration.ValidateAsync(
+            GetDataProtectionKeyDirectory(builder.Configuration, builder.Environment),
+            migrationBlobUri,
+            builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+
+    return;
+}
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -67,26 +129,49 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var dataProtectionKeyDirectory = builder.Configuration["DataProtection:KeysPath"];
-if (string.IsNullOrWhiteSpace(dataProtectionKeyDirectory))
+var dataProtectionBlobUri = builder.Configuration["DataProtection:Azure:BlobUri"];
+var dataProtection = builder.Services.AddDataProtection()
+    .SetApplicationName("NoteKeeping");
+
+if (!string.IsNullOrWhiteSpace(dataProtectionBlobUri))
 {
-    dataProtectionKeyDirectory = Path.Combine(
-        builder.Environment.ContentRootPath,
-        "App_Data",
-        "DataProtection-Keys");
+    if (!Uri.TryCreate(dataProtectionBlobUri, UriKind.Absolute, out var blobUri) ||
+        blobUri.Scheme != Uri.UriSchemeHttps ||
+        !string.IsNullOrEmpty(blobUri.Query) ||
+        !string.IsNullOrEmpty(blobUri.UserInfo) ||
+        !string.IsNullOrEmpty(blobUri.Fragment))
+    {
+        throw new InvalidOperationException(
+            "DataProtection:Azure:BlobUri must be an HTTPS blob URI without credentials or a query string.");
+    }
+
+    TokenCredential credential;
+    if (builder.Environment.IsProduction())
+    {
+        var managedIdentityClientId = builder.Configuration["DataProtection:Azure:ManagedIdentityClientId"];
+        credential = string.IsNullOrWhiteSpace(managedIdentityClientId)
+            ? new ManagedIdentityCredential()
+            : new ManagedIdentityCredential(managedIdentityClientId);
+    }
+    else
+    {
+        credential = new DefaultAzureCredential();
+    }
+
+    dataProtection.PersistKeysToAzureBlobStorage(blobUri, credential);
 }
-else if (!Path.IsPathRooted(dataProtectionKeyDirectory))
+else if (builder.Environment.IsProduction())
 {
-    dataProtectionKeyDirectory = Path.Combine(
-        builder.Environment.ContentRootPath,
-        dataProtectionKeyDirectory);
+    throw new InvalidOperationException(
+        "Configure DataProtection:Azure:BlobUri to a persistent shared Azure Blob before running in production.");
+}
+else
+{
+    dataProtection.PersistKeysToFileSystem(
+        GetDataProtectionKeyDirectory(builder.Configuration, builder.Environment));
 }
 
-builder.Services.AddDataProtection()
-    .SetApplicationName("NoteKeeping")
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeyDirectory));
-
-builder.Services.AddDbContext<NoteKeepingDbContext>(options =>
+builder.Services.AddDbContextFactory<NoteKeepingDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddHttpContextAccessor();

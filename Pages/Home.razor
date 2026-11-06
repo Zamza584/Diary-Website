@@ -193,6 +193,8 @@ else
     private int? loadedJournalId;
     private bool isNavigatingPage;
     private int dateHighlightSequence;
+    private readonly SemaphoreSlim noteSaveLock = new(1, 1);
+    private CancellationTokenSource? typingSaveCancellation;
 
     private async Task ApplyItalic()
     {
@@ -698,52 +700,92 @@ else
         await SaveNote();
     }
 
-    public async Task SaveNote()
+    public async Task SaveNote(bool showSaveStatus = true)
     {
-        if (currentNote == null || notebook == null)
+        if (showSaveStatus)
         {
-            return;
+            typingSaveCancellation?.Cancel();
         }
 
-        var newText = textValue ?? string.Empty;
-
-        if (string.Equals(currentNote.Text, newText, StringComparison.Ordinal))
-        {
-            if (notebook.CurrentPage < 1)
-            {
-                notebook.CurrentPage = 1;
-            }
-            return;
-        }
-
-        isSaving = true;
-        isSaved = false;
-        StateHasChanged();
+        await noteSaveLock.WaitAsync();
 
         try
         {
-            await StorageService.SaveNoteAsync(notebook, currentNote, newText);
-
-            if (hasManualSave)
+            if (currentNote == null || notebook == null)
             {
-                isSaved = true;
-                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            var newText = textValue ?? string.Empty;
+
+            if (string.Equals(currentNote.Text, newText, StringComparison.Ordinal))
+            {
+                if (notebook.CurrentPage < 1)
+                {
+                    notebook.CurrentPage = 1;
+                }
+                return;
+            }
+
+            if (showSaveStatus)
+            {
+                isSaving = true;
+                isSaved = false;
+                StateHasChanged();
+            }
+
+            try
+            {
+                await StorageService.SaveNoteAsync(notebook, currentNote, newText);
+
+                if (showSaveStatus && hasManualSave)
+                {
+                    isSaved = true;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            finally
+            {
+                if (showSaveStatus)
+                {
+                    isSaving = false;
+                    if (hasManualSave)
+                    {
+                        _ = TriggerSavedResetAsync();
+                    }
+                }
             }
         }
         finally
         {
-            isSaving = false;
-            if (hasManualSave)
-            {
-                _ = TriggerSavedResetAsync();
-            }
+            noteSaveLock.Release();
         }
     }
 
     private async Task SaveOnTyping()
     {
         hasManualSave = false;
-        await SaveNote();
+        var saveCancellation = new CancellationTokenSource();
+        var previousSaveCancellation = typingSaveCancellation;
+        typingSaveCancellation = saveCancellation;
+        previousSaveCancellation?.Cancel();
+
+        try
+        {
+            await Task.Delay(500, saveCancellation.Token);
+            await SaveNote(showSaveStatus: false);
+        }
+        catch (TaskCanceledException) when (saveCancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(typingSaveCancellation, saveCancellation))
+            {
+                typingSaveCancellation = null;
+            }
+            saveCancellation.Dispose();
+        }
     }
 
     private async Task TriggerSavedResetAsync()
@@ -755,6 +797,7 @@ else
 
     public void Dispose()
     {
+        typingSaveCancellation?.Cancel();
         ThemeService.OnThemeChanged -= OnThemeChangedHandler;
         AuthenticationStateProvider.AuthenticationStateChanged -= HandleAuthenticationStateChanged;
     }

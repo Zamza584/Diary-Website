@@ -1,5 +1,23 @@
 /App_Data/DataProtection-Keys/
 
+# Local credentials and secret overrides
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+appsettings.*.Secrets.json
+secrets*.json
+*.publishsettings
+
+# Private keys and signing certificates
+*.key
+*.pem
+*.pfx
+*.p12
+id_rsa
+id_ed25519
+
 # .NET build output and IDE state
 [Bb]in/
 [Oo]bj/
@@ -16,3 +34,7 @@ appsettings.Development.json
 *.db-*
 *.sqlite
 *.sqlite3
+
+services/DataProtectionKeyRingMigration.cs
+
+DATABASE.md
