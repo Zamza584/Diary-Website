@@ -51,6 +51,10 @@
   height: 56px;
 }
 
+.nav-item[b-zlgbdk1gca]  .nav-about-link {
+  margin-left: auto;
+}
+
 /* Active Link State */
 .nav-item[b-zlgbdk1gca]  a.active {
   background-color: rgba(88, 16, 16, 0.37);
@@ -67,8 +71,9 @@
 /* ========================================
    RESPONSIVE DESIGN
    ======================================== */
-@media (max-width: 640px) {
+@media (max-width: 880px) {
   .navigation[b-zlgbdk1gca] {
+    position: relative;
     display: block;
     width: auto;
     height: auto;
@@ -113,7 +118,7 @@
   }
 }
 
-@media (min-width: 641px) {
+@media (min-width: 881px) {
   .navbar-toggler[b-zlgbdk1gca] {
     display: none;
   }
