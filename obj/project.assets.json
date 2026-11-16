@@ -608,6 +608,19 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "Microsoft.Extensions.Logging.AzureAppServices/10.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Microsoft.Extensions.Logging.AzureAppServices.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.Logging.AzureAppServices.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Identity.Client/4.90.0": {
         "type": "package",
         "dependencies": {
@@ -2495,6 +2508,26 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Microsoft.Extensions.Logging.AzureAppServices/10.0.11": {
+      "sha512": "hYR4MnhuAGTfBS3uJK6eywcm7pDS/AcDpx3ek96RQpbo1eQak8oV8pu2oJW8QRmFE7wPdUkOwV9n1DOG1V5msw==",
+      "type": "package",
+      "path": "microsoft.extensions.logging.azureappservices/10.0.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net10.0/Microsoft.Extensions.Logging.AzureAppServices.dll",
+        "lib/net10.0/Microsoft.Extensions.Logging.AzureAppServices.xml",
+        "lib/net462/Microsoft.Extensions.Logging.AzureAppServices.dll",
+        "lib/net462/Microsoft.Extensions.Logging.AzureAppServices.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.Logging.AzureAppServices.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.Logging.AzureAppServices.xml",
+        "microsoft.extensions.logging.azureappservices.10.0.11.nupkg.sha512",
+        "microsoft.extensions.logging.azureappservices.nuspec"
+      ]
+    },
     "Microsoft.Identity.Client/4.90.0": {
       "sha512": "oc5A0jmu083T3OW1JVYMrM1rekIL8SkBRB/byMMQjFuYlRZsMh3wDeCwwrz9sGI6XlP5BIqO7XWgjPpF3reF5A==",
       "type": "package",
@@ -3070,6 +3103,7 @@
       "Microsoft.AspNetCore.Authentication.Google >= 10.0.11",
       "Microsoft.Data.Sqlite >= 10.0.11",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.11",
+      "Microsoft.Extensions.Logging.AzureAppServices >= 10.0.11",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 10.0.0"
     ]
   },
@@ -3145,6 +3179,10 @@
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "suppressParent": "All",
+            "target": "Package",
+            "version": "[10.0.11, )"
+          },
+          "Microsoft.Extensions.Logging.AzureAppServices": {
             "target": "Package",
             "version": "[10.0.11, )"
           },

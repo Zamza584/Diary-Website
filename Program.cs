@@ -86,6 +86,7 @@ else if (args.Length > 0 &&
 }
 
 var builder = WebApplication.CreateBuilder(applicationArgs);
+builder.Logging.AddAzureWebAppDiagnostics();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

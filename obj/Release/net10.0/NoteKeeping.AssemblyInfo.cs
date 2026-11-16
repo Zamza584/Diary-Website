@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NoteKeeping")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed4df7178dc81fdeb54faa1875808db6fa4c87ed")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aab23863d9156a47f1b1a8f0d6523a8a2808459c")]
 [assembly: System.Reflection.AssemblyProductAttribute("NoteKeeping")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NoteKeeping")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
