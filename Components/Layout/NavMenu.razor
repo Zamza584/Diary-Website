@@ -1,7 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Antiforgery
-@inject IAntiforgery Antiforgery
-@inject IHttpContextAccessor HttpContextAccessor
 
 <div class="navigation @(isMenuOpen ? "open" : "")">
     <button class="navbar-toggler" type="button" aria-label="Toggle navigation" aria-expanded="@isMenuOpen"
@@ -20,7 +17,7 @@
                         </NavLink>
 
                         <form method="post" action="/logout" class="d-block">
-                            <input type="hidden" name="__RequestVerificationToken" value="@GetRequestToken()" />
+                            <AntiforgeryToken />
                             <button type="submit"
                                     class="nav-link btn btn-link text-start p-0 w-100 text-decoration-none"
                                     style="color: inherit;">
@@ -63,16 +60,5 @@
     private void CloseMenu()
     {
         isMenuOpen = false;
-    }
-
-    private string GetRequestToken()
-    {
-        var httpContext = HttpContextAccessor.HttpContext;
-        if (httpContext is null)
-        {
-            return string.Empty;
-        }
-
-        return Antiforgery.GetAndStoreTokens(httpContext).RequestToken ?? string.Empty;
     }
 }

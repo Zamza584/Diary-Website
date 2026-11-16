@@ -1,11 +1,8 @@
 @page "/login"
-@using Microsoft.AspNetCore.Antiforgery
 @using Microsoft.AspNetCore.Components
 @using Microsoft.EntityFrameworkCore
 @using NoteKeeping.Data
 @using NoteKeeping.Models
-@inject IAntiforgery Antiforgery
-@inject IHttpContextAccessor HttpContextAccessor
 @inject NoteKeepingDbContext DbContext
 @inject NavigationManager Navigation
 
@@ -29,7 +26,7 @@
             }
 
             <form class="auth-form" method="post" action="/login">
-                <input type="hidden" name="__RequestVerificationToken" value="@GetRequestToken()" />
+                <AntiforgeryToken />
                 <div class="auth-field">
                     <label for="email">Email</label>
                     <input class="auth-input" type="email" name="email" id="email" @bind="Email"
@@ -85,16 +82,5 @@
             "google-email" => "Google did not provide a usable email address for this account.",
             _ => string.Empty
         };
-    }
-
-    private string GetRequestToken()
-    {
-        var httpContext = HttpContextAccessor.HttpContext;
-        if (httpContext is null)
-        {
-            return string.Empty;
-        }
-
-        return Antiforgery.GetAndStoreTokens(httpContext).RequestToken ?? string.Empty;
     }
 }
