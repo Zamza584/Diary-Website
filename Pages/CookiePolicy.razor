@@ -1,0 +1,92 @@
+@page "/cookies"
+@page "/cookie-policy"
+
+<PageTitle>Cookie Policy | Comfidiario</PageTitle>
+<SeoMetadata Title="Cookie Policy | Comfidiario"
+             Description="Understand the cookies and browser storage used by Comfidiario."
+             CanonicalPath="/cookies"
+             Robots="index, follow" />
+
+<main class="legal-page">
+    <article class="legal-document">
+        <p class="legal-eyebrow">Legal &amp; Privacy</p>
+        <h1>Cookie Policy</h1>
+        <p class="legal-updated">Based on the current application configuration; deployment settings may affect cookie behavior.</p>
+
+        <section>
+            <h2>What the application uses</h2>
+            <p>
+                The application uses cookies and browser storage for core functionality. The current source
+                does not show an analytics or advertising cookie integration. Hosting providers, identity
+                providers, and third-party resource providers may have separate technologies and policies.
+            </p>
+        </section>
+
+        <section>
+            <h2>Authentication cookie</h2>
+            <p>
+                The application issues an HTTP-only authentication cookie to keep a signed-in session. Its
+                configured lifetime is up to seven days. The production configuration requires the cookie
+                to be sent over HTTPS and uses SameSite=Lax. The browser does not expose this HTTP-only
+                cookie to ordinary page scripts.
+            </p>
+        </section>
+
+        <section>
+            <h2>Session cookie</h2>
+            <p>
+                The application configures a session cookie and a 30-minute session idle timeout. Its
+                Secure setting depends on the environment: HTTPS is required in production, while local
+                development follows the request scheme.
+            </p>
+        </section>
+
+        <section>
+            <h2>Antiforgery tokens</h2>
+            <p>
+                Antiforgery tokens help protect state-changing forms, such as sign-in, sign-out, and account
+                deletion, from cross-site request forgery. They are security functionality, not analytics.
+            </p>
+        </section>
+
+        <section>
+            <h2>Optional Google sign-in</h2>
+            <p>
+                If Google sign-in is configured, the application uses a separate short-lived external
+                authentication cookie during the sign-in flow. Google may also process information under
+                its own policies.
+            </p>
+        </section>
+
+        <section>
+            <h2>Local storage and third-party resources</h2>
+            <p>
+                Anonymous journal content is stored in the browser's local storage under an application
+                storage key. This is browser storage, not a cookie. The application also loads fonts from
+                Google Fonts and a script from jsDelivr; those providers may receive technical request
+                information when a browser retrieves their resources.
+            </p>
+        </section>
+
+        <section>
+            <h2>Managing browser storage</h2>
+            <p>
+                You can clear cookies and local storage through your browser settings. Clearing the
+                application's local storage removes anonymous journal data saved on that browser. Clearing
+                authentication cookies signs you out. Some features may not work as intended if required
+                security cookies or storage are blocked.
+            </p>
+        </section>
+
+        <p class="legal-note">
+            This page describes the application's source configuration. The operator should verify the
+            deployed configuration and any provider-set cookies before launch.
+        </p>
+
+        <nav class="legal-page-links" aria-label="Other legal pages">
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/contact">Contact &amp; Support</a>
+        </nav>
+    </article>
+</main>

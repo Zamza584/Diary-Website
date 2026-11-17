@@ -1,0 +1,129 @@
+.donate-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: clamp(24px, 6vw, 80px);
+  background:
+    radial-gradient(ellipse at 10% 12%, rgba(196, 213, 247, 0.58), transparent 28rem),
+    radial-gradient(ellipse at 90% 88%, rgba(244, 218, 198, 0.48), transparent 26rem),
+    #fbfaf7;
+  color: #1a293f;
+  font-family: "Inria Serif", Georgia, serif;
+}
+
+.donate-card {
+  width: min(100%, 720px);
+  padding: clamp(28px, 6vw, 64px);
+  border: 1px solid rgba(26, 41, 63, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 24px 70px rgba(26, 41, 63, 0.1);
+  text-align: center;
+}
+
+.donate-eyebrow {
+  margin: 0 0 16px;
+  color: #325092;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.donate-card h1 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.donate-intro {
+  max-width: 540px;
+  margin: 22px auto 0;
+  color: #576579;
+  font-size: 1.08rem;
+  line-height: 1.8;
+}
+
+.donate-notice {
+  margin-top: 32px;
+  padding: 22px;
+  border: 1px solid #d5dbea;
+  border-radius: 16px;
+  background: #f3f5fa;
+}
+
+.donate-notice h2 {
+  margin: 0;
+  color: #243d75;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.donate-notice p {
+  margin: 10px 0 0;
+  color: #576579;
+  line-height: 1.7;
+}
+
+.donate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.donate-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 20px;
+  border: 1px solid #325092;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.donate-button:hover {
+  transform: translateY(-2px);
+}
+
+.donate-button:focus-visible {
+  outline: 3px solid #8da8e2;
+  outline-offset: 4px;
+}
+
+.donate-button.primary {
+  background: #325092;
+  color: white;
+}
+
+.donate-button.primary:hover {
+  background: #243d75;
+}
+
+.donate-button.secondary {
+  background: transparent;
+  color: #325092;
+}
+
+.donate-button.secondary:hover {
+  background: #e8edf7;
+}
+
+@media (max-width: 520px) {
+  .donate-actions {
+    flex-direction: column;
+  }
+
+  .donate-button {
+    width: 100%;
+  }
+}

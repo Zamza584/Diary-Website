@@ -1,0 +1,76 @@
+@page "/profile"
+@attribute [Authorize]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using NoteKeeping.Data
+@using NoteKeeping.Models
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NoteKeepingDbContext DbContext
+
+<PageTitle>Profile | Comfidiario</PageTitle>
+<SeoMetadata Title="Profile | Comfidiario"
+             Description="View your Comfidiario account information."
+             CanonicalPath="/profile"
+             Robots="noindex, nofollow" />
+
+<main class="profile-page">
+    <section class="profile-card" aria-labelledby="profile-title">
+        <p class="profile-eyebrow">Your account</p>
+        <h1 id="profile-title">Profile</h1>
+
+        @if (isLoading)
+        {
+            <p role="status">Loading your profile...</p>
+        }
+        else if (account is null)
+        {
+            <p class="profile-error" role="alert">@errorMessage</p>
+        }
+        else
+        {
+            <div class="profile-avatar" aria-hidden="true">@ProfileInitial</div>
+            <dl class="profile-details">
+                <div>
+                    <dt>Name</dt>
+                    <dd>@account.Name</dd>
+                </div>
+                <div>
+                    <dt>Email</dt>
+                    <dd>@account.Email</dd>
+                </div>
+                <div>
+                    <dt>Member since</dt>
+                    <dd><time datetime="@account.CreatedAt.ToString("yyyy-MM-dd")">@account.CreatedAt.ToString("MMMM d, yyyy")</time></dd>
+                </div>
+            </dl>
+            <div class="profile-actions">
+                <a class="auth-button auth-button-primary" href="/journals">My journals</a>
+                <a class="auth-button auth-button-secondary" href="/account/delete">Delete account</a>
+            </div>
+        }
+    </section>
+</main>
+
+@code {
+    private UserAccount? account;
+    private bool isLoading = true;
+    private string errorMessage = "Your profile could not be loaded. Please sign in again.";
+    private string ProfileInitial =>
+        string.IsNullOrWhiteSpace(account?.Name) ? "?" : account.Name.Trim()[..1].ToUpperInvariant();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var accountIdValue = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(accountIdValue, out var accountId))
+        {
+            account = await DbContext.UserAccounts
+                .AsNoTracking()
+                .SingleOrDefaultAsync(user => user.Id == accountId);
+        }
+
+        isLoading = false;
+    }
+}

@@ -11,13 +11,34 @@
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "1.5.5",
           "Azure.Identity": "1.21.0",
           "BCrypt.Net-Next": "4.0.3",
+          "HtmlSanitizer": "11.0.26",
           "Microsoft.AspNetCore.Authentication.Google": "10.0.11",
           "Microsoft.Data.Sqlite": "10.0.11",
           "Microsoft.EntityFrameworkCore.Design": "10.0.11",
+          "Microsoft.Extensions.Logging.AzureAppServices": "10.0.11",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
         },
         "runtime": {
           "NoteKeeping.dll": {}
+        }
+      },
+      "AngleSharp/1.10.0": {
+        "runtime": {
+          "lib/net10.0/AngleSharp.dll": {
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "1.10.0.0"
+          }
+        }
+      },
+      "AngleSharp.Css/1.4.0": {
+        "dependencies": {
+          "AngleSharp": "1.10.0"
+        },
+        "runtime": {
+          "lib/net10.0/AngleSharp.Css.dll": {
+            "assemblyVersion": "1.4.0.0",
+            "fileVersion": "1.4.0.0"
+          }
         }
       },
       "Azure.Core/1.63.0": {
@@ -87,6 +108,18 @@
           "lib/net6.0/BCrypt.Net-Next.dll": {
             "assemblyVersion": "4.0.3.0",
             "fileVersion": "4.0.3.0"
+          }
+        }
+      },
+      "HtmlSanitizer/11.0.26": {
+        "dependencies": {
+          "AngleSharp": "1.10.0",
+          "AngleSharp.Css": "1.4.0"
+        },
+        "runtime": {
+          "lib/net8.0/HtmlSanitizer.dll": {
+            "assemblyVersion": "11.0.0.0",
+            "fileVersion": "11.0.26.0"
           }
         }
       },
@@ -469,6 +502,14 @@
           }
         }
       },
+      "Microsoft.Extensions.Logging.AzureAppServices/10.0.11": {
+        "runtime": {
+          "lib/net10.0/Microsoft.Extensions.Logging.AzureAppServices.dll": {
+            "assemblyVersion": "10.0.11.0",
+            "fileVersion": "10.0.1126.37416"
+          }
+        }
+      },
       "Microsoft.Identity.Client/4.90.0": {
         "dependencies": {
           "Microsoft.IdentityModel.Abstractions": "8.14.0"
@@ -812,6 +853,20 @@
       "serviceable": false,
       "sha512": ""
     },
+    "AngleSharp/1.10.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA==",
+      "path": "anglesharp/1.10.0",
+      "hashPath": "anglesharp.1.10.0.nupkg.sha512"
+    },
+    "AngleSharp.Css/1.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AAy28SOmB5EOdXqJC9dVBCKKeoQHyU2EKVMGpy/PT0jJpFvLd4bd5TyufwN09/piQmh0DBtkEn0X/F0SYuF9xQ==",
+      "path": "anglesharp.css/1.4.0",
+      "hashPath": "anglesharp.css.1.4.0.nupkg.sha512"
+    },
     "Azure.Core/1.63.0": {
       "type": "package",
       "serviceable": true,
@@ -853,6 +908,13 @@
       "sha512": "sha512-W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
       "path": "bcrypt.net-next/4.0.3",
       "hashPath": "bcrypt.net-next.4.0.3.nupkg.sha512"
+    },
+    "HtmlSanitizer/11.0.26": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZGjvcmVumFkxxT1JSvENjoTscgJPgpEMMxSdgdfEzWo7HgbYdxohxWtLB0v9+vXb9kTi++ZQok/AvJo6W1otXw==",
+      "path": "htmlsanitizer/11.0.26",
+      "hashPath": "htmlsanitizer.11.0.26.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
@@ -965,6 +1027,13 @@
       "sha512": "sha512-PJPtFYsZ+r+uz9qqXWUTEyKeJ1EiBGIJtqavkg9ZXijjGSFAk4Fgi5sqIxj+uAyLZwEKgexDUQXhWhvU6l3+og==",
       "path": "microsoft.extensions.dependencymodel/10.0.11",
       "hashPath": "microsoft.extensions.dependencymodel.10.0.11.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging.AzureAppServices/10.0.11": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hYR4MnhuAGTfBS3uJK6eywcm7pDS/AcDpx3ek96RQpbo1eQak8oV8pu2oJW8QRmFE7wPdUkOwV9n1DOG1V5msw==",
+      "path": "microsoft.extensions.logging.azureappservices/10.0.11",
+      "hashPath": "microsoft.extensions.logging.azureappservices.10.0.11.nupkg.sha512"
     },
     "Microsoft.Identity.Client/4.90.0": {
       "type": "package",

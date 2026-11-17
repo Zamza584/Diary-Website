@@ -25,6 +25,13 @@
                 <div class="auth-alert auth-alert-error" aria-live="polite">@ErrorMessage</div>
             }
 
+            @if (Deleted)
+            {
+                <div class="auth-alert auth-alert-success" aria-live="polite">
+                    Your account and associated notebook data have been deleted.
+                </div>
+            }
+
             <form class="auth-form" method="post" action="/login">
                 <AntiforgeryToken />
                 <div class="auth-field">
@@ -48,6 +55,10 @@
                     <a class="auth-button auth-button-secondary" href="/register">Create account</a>
                 </div>
             </form>
+            <p class="auth-legal-links">
+                By signing in, you acknowledge the <a href="/privacy">Privacy Policy</a> and
+                <a href="/terms">Terms of Service</a>.
+            </p>
 
             <div class="auth-divider"><span>or</span></div>
             <a class="auth-button auth-button-google" href="/auth/google">
@@ -65,6 +76,9 @@
 @code {
     [SupplyParameterFromQuery]
     public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool Deleted { get; set; }
 
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;

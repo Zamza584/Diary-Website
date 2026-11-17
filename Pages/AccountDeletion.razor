@@ -1,0 +1,50 @@
+@page "/account/delete"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Delete account | Comfidiario</PageTitle>
+<SeoMetadata Title="Delete account | Comfidiario"
+             Description="Permanently delete your Comfidiario account and associated notebook data."
+             CanonicalPath="/account/delete"
+             Robots="noindex, nofollow" />
+
+<main class="auth-page">
+    <section class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-header">
+                <span class="auth-kicker">Account settings</span>
+                <h1>Delete your account</h1>
+                <p>This permanently deletes your account, journals, and journal entries. This cannot be undone.</p>
+            </div>
+
+            <p>
+                Copies in operational logs or backups may remain until those systems' normal retention and
+                deletion processes remove them.
+            </p>
+
+            @if (Error == "confirmation")
+            {
+                <p class="auth-alert auth-alert-error" role="alert">Type DELETE exactly to confirm account deletion.</p>
+            }
+
+            <form method="post" action="/account/delete" class="auth-form">
+                <AntiforgeryToken />
+                <div class="auth-field">
+                    <label for="confirmation">Type DELETE to confirm</label>
+                    <input class="auth-input" id="confirmation" name="confirmation" type="text"
+                           autocomplete="off" required />
+                </div>
+                <div class="auth-actions">
+                    <button class="auth-button auth-button-primary" type="submit">Delete my account</button>
+                    <a class="auth-button auth-button-secondary" href="/journals">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+}

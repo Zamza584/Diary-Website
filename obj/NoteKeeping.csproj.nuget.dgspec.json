@@ -56,6 +56,10 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "HtmlSanitizer": {
+              "target": "Package",
+              "version": "[11.0.26, )"
+            },
             "Microsoft.AspNetCore.App.Internal.Assets": {
               "suppressParent": "All",
               "target": "Package",

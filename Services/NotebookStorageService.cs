@@ -18,17 +18,20 @@ public class NotebookStorageService
     private readonly IDbContextFactory<NoteKeepingDbContext> _dbContextFactory;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly IJSRuntime _jsRuntime;
+    private readonly NotebookContentSanitizer _contentSanitizer;
     private readonly SemaphoreSlim _anonymousStorageLock = new(1, 1);
     private const string AnonymousNotebookKey = "anon-notebook";
 
     public NotebookStorageService(
         IDbContextFactory<NoteKeepingDbContext> dbContextFactory,
         AuthenticationStateProvider authenticationStateProvider,
-        IJSRuntime jsRuntime)
+        IJSRuntime jsRuntime,
+        NotebookContentSanitizer contentSanitizer)
     {
         _dbContextFactory = dbContextFactory;
         _authenticationStateProvider = authenticationStateProvider;
         _jsRuntime = jsRuntime;
+        _contentSanitizer = contentSanitizer;
     }
 
     /// <summary>
@@ -127,6 +130,13 @@ public class NotebookStorageService
         return authState.User.Identity?.IsAuthenticated ?? false;
     }
 
+    private async Task<int?> GetAuthenticatedUserAccountIdAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var accountId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(accountId, out var parsedAccountId) ? parsedAccountId : null;
+    }
+
     /// <summary>
     /// Loads notebook for authenticated user from database.
     /// </summary>
@@ -134,30 +144,47 @@ public class NotebookStorageService
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        var email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity?.Name ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(email))
+        var accountIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(accountIdValue, out var accountId))
+        {
             return null;
+        }
 
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        var userAccount = await dbContext.UserAccounts
-            .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-
-        if (userAccount == null)
-            return null;
-
         IQueryable<Notebook> notebooks = dbContext.Notebooks
             .Include(n => n.Notes)
-            .Where(n => n.UserAccountId == userAccount.Id);
+            .Where(n => n.UserAccountId == accountId);
 
         if (notebookId.HasValue)
         {
             notebooks = notebooks.Where(n => n.Id == notebookId.Value);
         }
 
-        return await notebooks
+        var notebook = await notebooks
             .OrderByDescending(n => n.Id)
             .FirstOrDefaultAsync();
+        if (notebook is null)
+        {
+            return null;
+        }
+
+        var contentChanged = false;
+        foreach (var note in notebook.Notes)
+        {
+            var sanitizedText = _contentSanitizer.Sanitize(note.Text);
+            if (!string.Equals(note.Text, sanitizedText, StringComparison.Ordinal))
+            {
+                note.Text = sanitizedText;
+                contentChanged = true;
+            }
+        }
+
+        if (contentChanged)
+        {
+            await dbContext.SaveChangesAsync();
+        }
+
+        return notebook;
     }
 
     /// <summary>
@@ -183,6 +210,11 @@ public class NotebookStorageService
             }
 
             notebook.Notes ??= new List<Note>();
+            foreach (var note in notebook.Notes)
+            {
+                note.Text = _contentSanitizer.Sanitize(note.Text);
+            }
+
             while (notebook.Notes.Count < notebook.TotalPages)
             {
                 notebook.Notes.Add(new Note
@@ -232,7 +264,7 @@ public class NotebookStorageService
                 Notes = (notebook.Notes ?? new List<Note>()).Select(n => new
                 {
                     n.Id,
-                    n.Text,
+                    Text = _contentSanitizer.Sanitize(n.Text),
                     n.Date,
                     n.NotebookId
                 }).ToList()
@@ -260,15 +292,22 @@ public class NotebookStorageService
     /// </summary>
     private async Task SaveNoteToDatabaseAsync(Note currentNote, string noteText, Notebook notebook)
     {
+        var accountId = await GetAuthenticatedUserAccountIdAsync();
+        if (!accountId.HasValue)
+        {
+            return;
+        }
+
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var trackedNotebook = await dbContext.Notebooks
             .Include(n => n.Notes)
-            .SingleOrDefaultAsync(n => n.Id == notebook.Id);
+            .SingleOrDefaultAsync(n => n.Id == notebook.Id && n.UserAccountId == accountId.Value);
         if (trackedNotebook is null)
         {
             return;
         }
 
+        var sanitizedText = _contentSanitizer.Sanitize(noteText);
         trackedNotebook.CurrentPage = Math.Clamp(notebook.CurrentPage, 1, notebook.TotalPages);
         var trackedNote = currentNote.Id == 0
             ? null
@@ -280,26 +319,32 @@ public class NotebookStorageService
 
         if (trackedNote is not null)
         {
-            trackedNote.Text = noteText;
+            trackedNote.Text = sanitizedText;
             trackedNote.Date = currentNote.Date;
         }
         else
         {
-            currentNote.Text = noteText;
+            currentNote.Text = sanitizedText;
             currentNote.NotebookId = notebook.Id;
             trackedNotebook.Notes.Add(currentNote);
         }
 
         await dbContext.SaveChangesAsync();
-        currentNote.Text = noteText;
+        currentNote.Text = sanitizedText;
     }
 
     private async Task SaveNotebookToDatabaseAsync(Notebook notebook)
     {
+        var accountId = await GetAuthenticatedUserAccountIdAsync();
+        if (!accountId.HasValue)
+        {
+            return;
+        }
+
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var trackedNotebook = await dbContext.Notebooks
             .Include(n => n.Notes)
-            .SingleOrDefaultAsync(n => n.Id == notebook.Id);
+            .SingleOrDefaultAsync(n => n.Id == notebook.Id && n.UserAccountId == accountId.Value);
 
         if (trackedNotebook is null)
         {
@@ -317,8 +362,14 @@ public class NotebookStorageService
                 ? null
                 : trackedNotebook.Notes.SingleOrDefault(n => n.Id == note.Id);
 
+            if (note.Id != 0 && trackedNote is null)
+            {
+                throw new InvalidOperationException("The note does not belong to the current notebook.");
+            }
+
             if (trackedNote is null)
             {
+                note.Text = _contentSanitizer.Sanitize(note.Text);
                 note.NotebookId = trackedNotebook.Id;
                 trackedNotebook.Notes.Add(note);
             }

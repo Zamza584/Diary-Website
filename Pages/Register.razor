@@ -45,8 +45,30 @@
 
                 <div class="auth-field">
                     <label for="password">Password</label>
-                    <input class="auth-input" type="password" name="password" id="password" @bind="Password"
-                           placeholder="Create a password">
+                    <div class="auth-password-control">
+                        <input class="auth-input" type="@(showPassword ? "text" : "password")" name="password"
+                               id="password" @bind="Password" autocomplete="new-password"
+                               placeholder="Create a password">
+                        <button class="auth-password-toggle" type="button" aria-pressed="@showPassword"
+                                aria-label="@(showPassword ? "Hide password" : "Show password")"
+                                @onclick="() => showPassword = !showPassword">
+                            @(showPassword ? "Hide" : "Show")
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="confirm-password">Confirm password</label>
+                    <div class="auth-password-control">
+                        <input class="auth-input" type="@(showConfirmPassword ? "text" : "password")"
+                               name="confirmPassword" id="confirm-password" @bind="ConfirmPassword"
+                               autocomplete="new-password" placeholder="Re-enter your password">
+                        <button class="auth-password-toggle" type="button" aria-pressed="@showConfirmPassword"
+                                aria-label="@(showConfirmPassword ? "Hide confirmation password" : "Show confirmation password")"
+                                @onclick="() => showConfirmPassword = !showConfirmPassword">
+                            @(showConfirmPassword ? "Hide" : "Show")
+                        </button>
+                    </div>
                 </div>
 
                 <div class="auth-actions">
@@ -55,6 +77,10 @@
                         <a class="auth-button auth-button-secondary" href="/login">Back to login</a>
                     </div>
                 </div>
+                <p class="auth-legal-links">
+                    By creating an account, you acknowledge the <a href="/privacy">Privacy Policy</a> and
+                    <a href="/terms">Terms of Service</a>.
+                </p>
             </div>
         </div>
     </div>
@@ -63,16 +89,20 @@
     private string Name { get; set; } = string.Empty;
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;
+    private string ConfirmPassword { get; set; } = string.Empty;
     private string ErrorMessage { get; set; } = string.Empty;
     private string SuccessMessage { get; set; } = string.Empty;
+    private bool showPassword;
+    private bool showConfirmPassword;
 
     private async Task RegisterAsync()
     {
         SuccessMessage = string.Empty;
 
-        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) ||
+            string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(ConfirmPassword))
         {
-            ErrorMessage = "Please enter your name, email, and password.";
+            ErrorMessage = "Please complete all fields.";
             return;
         }
 
@@ -97,6 +127,12 @@
         if (Password.Length < 12)
         {
             ErrorMessage = "Password must be at least 12 characters long.";
+            return;
+        }
+
+        if (!string.Equals(Password, ConfirmPassword, StringComparison.Ordinal))
+        {
+            ErrorMessage = "Passwords do not match.";
             return;
         }
 
@@ -126,6 +162,9 @@
         Name = string.Empty;
         Email = string.Empty;
         Password = string.Empty;
+        ConfirmPassword = string.Empty;
+        showPassword = false;
+        showConfirmPassword = false;
 
         await Task.Delay(500);
         Navigation.NavigateTo("/login");

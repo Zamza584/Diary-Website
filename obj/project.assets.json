@@ -2,6 +2,35 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "AngleSharp/1.10.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/AngleSharp.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/AngleSharp.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "AngleSharp.Css/1.4.0": {
+        "type": "package",
+        "dependencies": {
+          "AngleSharp": "[1.10.0, 2.0.0)"
+        },
+        "compile": {
+          "lib/net10.0/AngleSharp.Css.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/AngleSharp.Css.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Azure.Core/1.63.0": {
         "type": "package",
         "dependencies": {
@@ -101,6 +130,23 @@
         },
         "runtime": {
           "lib/net6.0/BCrypt.Net-Next.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "HtmlSanitizer/11.0.26": {
+        "type": "package",
+        "dependencies": {
+          "AngleSharp": "1.10.0",
+          "AngleSharp.Css": "1.4.0"
+        },
+        "compile": {
+          "lib/net8.0/HtmlSanitizer.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/HtmlSanitizer.dll": {
             "related": ".xml"
           }
         }
@@ -1072,6 +1118,52 @@
     }
   },
   "libraries": {
+    "AngleSharp/1.10.0": {
+      "sha512": "jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA==",
+      "type": "package",
+      "path": "anglesharp/1.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "anglesharp.1.10.0.nupkg.sha512",
+        "anglesharp.nuspec",
+        "lib/net10.0/AngleSharp.dll",
+        "lib/net10.0/AngleSharp.xml",
+        "lib/net462/AngleSharp.dll",
+        "lib/net462/AngleSharp.xml",
+        "lib/net472/AngleSharp.dll",
+        "lib/net472/AngleSharp.xml",
+        "lib/net8.0/AngleSharp.dll",
+        "lib/net8.0/AngleSharp.xml",
+        "lib/netstandard2.0/AngleSharp.dll",
+        "lib/netstandard2.0/AngleSharp.xml",
+        "logo.png"
+      ]
+    },
+    "AngleSharp.Css/1.4.0": {
+      "sha512": "AAy28SOmB5EOdXqJC9dVBCKKeoQHyU2EKVMGpy/PT0jJpFvLd4bd5TyufwN09/piQmh0DBtkEn0X/F0SYuF9xQ==",
+      "type": "package",
+      "path": "anglesharp.css/1.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "anglesharp.css.1.4.0.nupkg.sha512",
+        "anglesharp.css.nuspec",
+        "lib/net10.0/AngleSharp.Css.dll",
+        "lib/net10.0/AngleSharp.Css.xml",
+        "lib/net462/AngleSharp.Css.dll",
+        "lib/net462/AngleSharp.Css.xml",
+        "lib/net472/AngleSharp.Css.dll",
+        "lib/net472/AngleSharp.Css.xml",
+        "lib/net8.0/AngleSharp.Css.dll",
+        "lib/net8.0/AngleSharp.Css.xml",
+        "lib/netstandard2.0/AngleSharp.Css.dll",
+        "lib/netstandard2.0/AngleSharp.Css.xml",
+        "logo.png"
+      ]
+    },
     "Azure.Core/1.63.0": {
       "sha512": "5egODg5yWcRV0kkAv22jQL7YmsfupX7intDYbxZMu8giASSQVfG5+mwC+BdJOWvhFT1Y+9KzuvbUGqAVEBzsfw==",
       "type": "package",
@@ -1209,6 +1301,26 @@
         "lib/netstandard2.1/BCrypt.Net-Next.dll",
         "lib/netstandard2.1/BCrypt.Net-Next.xml",
         "readme.md"
+      ]
+    },
+    "HtmlSanitizer/11.0.26": {
+      "sha512": "ZGjvcmVumFkxxT1JSvENjoTscgJPgpEMMxSdgdfEzWo7HgbYdxohxWtLB0v9+vXb9kTi++ZQok/AvJo6W1otXw==",
+      "type": "package",
+      "path": "htmlsanitizer/11.0.26",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "htmlsanitizer.11.0.26.nupkg.sha512",
+        "htmlsanitizer.nuspec",
+        "lib/net462/HtmlSanitizer.dll",
+        "lib/net462/HtmlSanitizer.xml",
+        "lib/net47/HtmlSanitizer.dll",
+        "lib/net47/HtmlSanitizer.xml",
+        "lib/net8.0/HtmlSanitizer.dll",
+        "lib/net8.0/HtmlSanitizer.xml",
+        "lib/netstandard2.0/HtmlSanitizer.dll",
+        "lib/netstandard2.0/HtmlSanitizer.xml"
       ]
     },
     "Humanizer.Core/2.14.1": {
@@ -3099,6 +3211,7 @@
       "Azure.Extensions.AspNetCore.DataProtection.Blobs >= 1.5.5",
       "Azure.Identity >= 1.21.0",
       "BCrypt.Net-Next >= 4.0.3",
+      "HtmlSanitizer >= 11.0.26",
       "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.1",
       "Microsoft.AspNetCore.Authentication.Google >= 10.0.11",
       "Microsoft.Data.Sqlite >= 10.0.11",
@@ -3161,6 +3274,10 @@
           "BCrypt.Net-Next": {
             "target": "Package",
             "version": "[4.0.3, )"
+          },
+          "HtmlSanitizer": {
+            "target": "Package",
+            "version": "[11.0.26, )"
           },
           "Microsoft.AspNetCore.App.Internal.Assets": {
             "suppressParent": "All",

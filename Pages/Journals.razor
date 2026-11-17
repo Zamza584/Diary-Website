@@ -84,23 +84,39 @@
     <div class="journal-dialog-overlay" @onclick="CloseCreateJournalDialog">
         <section class="journal-dialog" role="dialog" aria-modal="true" aria-labelledby="create-journal-title"
                  @onclick:stopPropagation="true">
-            <h2 id="create-journal-title">Create a journal</h2>
-            <label for="new-journal-title">Journal title</label>
-            <input id="new-journal-title" class="journal-dialog-input" autofocus @bind="newJournalTitle"
-                   @bind:event="oninput" @onkeydown="HandleCreateJournalKeyDownAsync"
-                   @onkeydown:stopPropagation="true" />
-            @if (!string.IsNullOrWhiteSpace(createJournalError))
+            @if (journals.Count >= MaximumJournals)
             {
-                <p class="journal-edit-error" role="alert">@createJournalError</p>
+                <h2 id="create-journal-title">Journal limit reached</h2>
+                <p>You can create up to @MaximumJournals journals. To help Comfidiario grow, visit the support page.</p>
+                <div class="journal-dialog-actions">
+                    <a class="journal-dialog-button primary journal-support-link" href="/donate">
+                        Support Comfidiario
+                    </a>
+                    <button class="journal-dialog-button secondary" type="button" @onclick="CloseCreateJournalDialog">
+                        Close
+                    </button>
+                </div>
             }
-            <div class="journal-dialog-actions">
-                <button class="journal-dialog-button secondary" type="button" @onclick="CloseCreateJournalDialog"
-                        disabled="@isAddingJournal">Cancel</button>
-                <button class="journal-dialog-button primary" type="button" @onclick="CreateJournalAsync"
-                        disabled="@isAddingJournal">
-                    @(isAddingJournal ? "Creating..." : "Create journal")
-                </button>
-            </div>
+            else
+            {
+                <h2 id="create-journal-title">Create a journal</h2>
+                <label for="new-journal-title">Journal title</label>
+                <input id="new-journal-title" class="journal-dialog-input" autofocus @bind="newJournalTitle"
+                       @bind:event="oninput" @onkeydown="HandleCreateJournalKeyDownAsync"
+                       @onkeydown:stopPropagation="true" />
+                @if (!string.IsNullOrWhiteSpace(createJournalError))
+                {
+                    <p class="journal-edit-error" role="alert">@createJournalError</p>
+                }
+                <div class="journal-dialog-actions">
+                    <button class="journal-dialog-button secondary" type="button" @onclick="CloseCreateJournalDialog"
+                            disabled="@isAddingJournal">Cancel</button>
+                    <button class="journal-dialog-button primary" type="button" @onclick="CreateJournalAsync"
+                            disabled="@isAddingJournal">
+                        @(isAddingJournal ? "Creating..." : "Create journal")
+                    </button>
+                </div>
+            }
         </section>
     </div>
 }
@@ -129,6 +145,8 @@
 }
 
 @code {
+    private const int MaximumJournals = 20;
+
     private List<Notebook> journals = new();
     private int? userAccountId;
     private bool isAddingJournal;
@@ -154,15 +172,15 @@
             return;
         }
 
-        var email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity.Name ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(email))
+        var accountIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(accountIdValue, out var accountId))
         {
             journals = new();
             return;
         }
 
         var userAccount = await DbContext.UserAccounts
-            .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            .SingleOrDefaultAsync(u => u.Id == accountId);
 
         if (userAccount is null)
         {
@@ -230,6 +248,19 @@
 
         try
         {
+            var journalCount = await DbContext.Notebooks
+                .CountAsync(journal => journal.UserAccountId == userAccountId.Value);
+
+            if (journalCount >= MaximumJournals)
+            {
+                journals = await DbContext.Notebooks
+                    .Where(journal => journal.UserAccountId == userAccountId.Value)
+                    .OrderBy(journal => journal.Date)
+                    .ThenBy(journal => journal.Id)
+                    .ToListAsync();
+                return;
+            }
+
             var journal = new Notebook
             {
                 Title = title,
@@ -289,9 +320,18 @@
 
         var journal = pendingDeleteJournal;
         isDeletingJournal = true;
-        DbContext.Notebooks.Remove(journal);
         try
         {
+            var ownedJournal = await DbContext.Notebooks.SingleOrDefaultAsync(
+                item => item.Id == journal.Id && item.UserAccountId == userAccountId);
+            if (ownedJournal is null)
+            {
+                journals.Remove(journal);
+                pendingDeleteJournal = null;
+                return;
+            }
+
+            DbContext.Notebooks.Remove(ownedJournal);
             await DbContext.SaveChangesAsync();
             journals.Remove(journal);
             if (editingJournalId == journal.Id)
@@ -346,8 +386,16 @@
             return;
         }
 
-        var journal = journals.SingleOrDefault(j => j.Id == editingJournalId.Value);
+        var journal = await DbContext.Notebooks.SingleOrDefaultAsync(
+            item => item.Id == editingJournalId.Value && item.UserAccountId == userAccountId);
         if (journal is null)
+        {
+            titleEditError = "This journal could not be found. Refresh the page and try again.";
+            return;
+        }
+
+        var listJournal = journals.SingleOrDefault(item => item.Id == journal.Id);
+        if (listJournal is null)
         {
             titleEditError = "This journal could not be found. Refresh the page and try again.";
             return;
@@ -361,6 +409,7 @@
         try
         {
             await DbContext.SaveChangesAsync();
+            listJournal.Title = updatedTitle;
             editingJournalId = null;
         }
         catch (DbUpdateException)

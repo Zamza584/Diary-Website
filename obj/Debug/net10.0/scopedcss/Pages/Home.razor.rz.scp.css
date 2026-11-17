@@ -44,6 +44,12 @@
   width: 144px;
   height: 105.85px;
   font-family: "Ingrid Darling", cursive;
+  text-decoration: none;
+}
+
+.logo:focus-visible[b-ujv6ega1qq] {
+  outline: 3px solid #325092;
+  outline-offset: 3px;
 }
 
 .logo p[b-ujv6ega1qq] {
@@ -544,6 +550,17 @@
   margin-top: 18px;
 }
 
+.journal-action-icon[b-ujv6ega1qq] {
+  display: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .notes-saved[b-ujv6ega1qq] {
   display: grid;
   gap: 12px;
@@ -733,13 +750,22 @@
   }
 
   .page-actions[b-ujv6ega1qq] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .page-actions .journal-action[b-ujv6ega1qq] {
-    min-height: 44px;
-    padding: 0.7rem 0.4rem;
-    font-size: 0.85rem;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0.55rem 0.25rem;
+  }
+
+  .journal-action-icon[b-ujv6ega1qq] {
+    display: block;
+  }
+
+  .journal-action-label[b-ujv6ega1qq] {
+    display: none;
   }
 
   .journal-area[b-ujv6ega1qq] {

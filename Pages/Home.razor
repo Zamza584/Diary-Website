@@ -21,6 +21,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NotebookStorageService StorageService
 @inject NavigationManager NavManager
+@inject NotebookContentSanitizer ContentSanitizer
 
 @inject IJSRuntime JS
 
@@ -37,9 +38,9 @@ else
     <div class="theme-@Theme"
          style="background-color: @ThemeService.BgColor; color: @ThemeService.TextColor; font-family: 'Georgia', serif; transition: background-color 0.5s, color 0.5s;">
         <div class="journal-page-shell">
-            <div class="logo">
-                <p>D</p>
-            </div>
+            <a class="logo" href="/about" aria-label="About Comfidiario">
+                <p aria-hidden="true">D</p>
+            </a>
             <div class="journal-section journal-section-main">
                 <header class="journal-header">
                     <div>
@@ -114,16 +115,52 @@ else
                 </div>
 
                 <div class="page-actions">
-                    <button class="journal-action primary submit-button" href="/journals"
-                            @onclick="NavigateToJournals">Journals</button>
+                    <button class="journal-action primary submit-button" type="button" aria-label="Open journals"
+                            title="Journals" @onclick="NavigateToJournals">
+                        <svg class="journal-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 4.75A2.75 2.75 0 0 1 7.75 2H20v17H7.75A2.75 2.75 0 0 0 5 21.75v-17Z" />
+                            <path d="M5 5v16M8 6h8M8 10h8M8 14h6" />
+                        </svg>
+                        <span class="journal-action-label">Journals</span>
+                    </button>
                     <button @onclick="HandlePreviousPageClick" @ref="previousPageButton" class="journal-action secondary"
-                            type="button" disabled="@isNavigatingPage">Previous</button>
+                            type="button" aria-label="Previous page" title="Previous page" disabled="@isNavigatingPage">
+                        <svg class="journal-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m15 18-6-6 6-6" />
+                            <path d="M9 12h11" />
+                        </svg>
+                        <span class="journal-action-label">Previous</span>
+                    </button>
                     <button @onclick="HandleNextPageClick" @ref="nextPageButton" class="journal-action secondary"
-                            type="button" disabled="@isNavigatingPage">Next</button>
+                            type="button" aria-label="Next page" title="Next page" disabled="@isNavigatingPage">
+                        <svg class="journal-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m9 18 6-6-6-6" />
+                            <path d="M4 12h11" />
+                        </svg>
+                        <span class="journal-action-label">Next</span>
+                    </button>
                     <button @onclick="HandleManualSave"
                             class="journal-action primary submit-button @(isSaved && hasManualSave ? "saved" : "")"
-                            type="button" disabled="@isSaving">
-                        @(isSaving && hasManualSave ? "Saving..." : isSaved && hasManualSave ? "Saved!" : "Save Note")
+                            type="button"
+                            aria-label="@(isSaving && hasManualSave ? "Saving note" : isSaved && hasManualSave ? "Note saved" : "Save note")"
+                            title="@(isSaving && hasManualSave ? "Saving note" : isSaved && hasManualSave ? "Note saved" : "Save note")"
+                            disabled="@isSaving">
+                        @if (isSaved && hasManualSave && !isSaving)
+                        {
+                            <svg class="journal-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m5 12 4 4L19 6" />
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg class="journal-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 3.75h12l3.25 3.25v13.25H3.75V3.75H5Z" />
+                                <path d="M8 4v5h8V4M8 20v-7h8v7" />
+                            </svg>
+                        }
+                        <span class="journal-action-label">
+                            @(isSaving && hasManualSave ? "Saving..." : isSaved && hasManualSave ? "Saved!" : "Save Note")
+                        </span>
                     </button>
                 </div>
             </div>
@@ -226,14 +263,25 @@ else
             return;
         }
 
-        textValue = result;
+        textValue = ContentSanitizer.Sanitize(result);
+        if (!string.Equals(result, textValue, StringComparison.Ordinal))
+        {
+            await JS.InvokeVoidAsync("setContentEditableHtml", editorRef, textValue, isFirstPage);
+        }
+
         await SaveNote();
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleEditorInput()
     {
-        textValue = await JS.InvokeAsync<string>("getContentEditableHtml", editorRef);
+        var editorHtml = await JS.InvokeAsync<string>("getContentEditableHtml", editorRef);
+        textValue = ContentSanitizer.Sanitize(editorHtml);
+        if (!string.Equals(editorHtml, textValue, StringComparison.Ordinal))
+        {
+            await JS.InvokeVoidAsync("setContentEditableHtml", editorRef, textValue, isFirstPage);
+        }
+
         await SaveOnTyping();
     }
 
@@ -268,6 +316,7 @@ else
     {
         if (firstRender)
         {
+            await JS.InvokeVoidAsync("preventUnsafeEditorPaste", editorRef);
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             if (authState.User.Identity?.IsAuthenticated == true)
             {
@@ -324,7 +373,7 @@ else
         await JS.InvokeVoidAsync(
             "setContentEditableHtml",
             editorRef,
-            textValue ?? string.Empty,
+            ContentSanitizer.Sanitize(textValue),
             isFirstPage);
     }
 
@@ -368,6 +417,13 @@ else
             return;
         }
 
+        var accountIdValue = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(accountIdValue, out var accountId))
+        {
+            ClearNotebookState();
+            return;
+        }
+
         var email = user.FindFirstValue(ClaimTypes.Email) ?? user.Identity.Name ?? user.FindFirstValue("email") ?? string.Empty;
         currentUserEmail = email;
 
@@ -392,7 +448,7 @@ else
         if (notebook == null)
         {
             var userAccount = await DbContext.UserAccounts
-                .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+                .SingleOrDefaultAsync(u => u.Id == accountId);
 
             if (userAccount == null)
             {
@@ -666,9 +722,14 @@ else
         {
             // Authenticated: save to database
             var newNotebook = CreateNewNotebook();
-            var email = authState.User.FindFirstValue(ClaimTypes.Email) ?? authState.User.Identity?.Name ?? string.Empty;
+            var accountIdValue = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(accountIdValue, out var accountId))
+            {
+                return;
+            }
+
             var userAccount = await DbContext.UserAccounts
-                .SingleOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+                .SingleOrDefaultAsync(u => u.Id == accountId);
 
             if (userAccount != null)
             {

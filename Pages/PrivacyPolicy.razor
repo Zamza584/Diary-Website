@@ -1,0 +1,132 @@
+@page "/privacy"
+@page "/privacy-policy"
+
+<PageTitle>Privacy Policy | Comfidiario</PageTitle>
+<SeoMetadata Title="Privacy Policy | Comfidiario"
+             Description="Learn what information Comfidiario handles and how account and journal data are used."
+             CanonicalPath="/privacy"
+             Robots="index, follow" />
+
+<main class="legal-page">
+    <article class="legal-document">
+        <p class="legal-eyebrow">Legal &amp; Privacy</p>
+        <h1>Privacy Policy</h1>
+        <p class="legal-updated">Service information draft — review and complete operator and provider details before public launch.</p>
+
+        <section>
+            <h2>Who operates Comfidiario</h2>
+            <p>
+                Comfidiario is operated by an individual based in Peru. The operator's full legal name and
+                postal contact address have not been supplied for this page and must be added before launch.
+                “We” in this policy refers to the Comfidiario operator.
+            </p>
+        </section>
+
+        <section>
+            <h2>Information the service handles</h2>
+            <ul>
+                <li>
+                    <strong>Account information:</strong> your display name, email address, account creation
+                    time, and a password hash when you register with a password. Passwords are hashed; the
+                    application does not store the submitted password as plain text.
+                </li>
+                <li>
+                    <strong>Sign-in information:</strong> if Google sign-in is enabled, the application uses
+                    the name and email returned during sign-in to find or create an account. Google handles
+                    its own sign-in flow under its own terms and privacy policy.
+                </li>
+                <li>
+                    <strong>Journal information:</strong> journal titles, entries, dates, and page information
+                    that you create. Signed-in journal titles and entry text are protected by ASP.NET Core
+                    Data Protection before being stored in the application's database. This is not
+                    end-to-end encryption: the service can decrypt this information to provide the journal.
+                </li>
+                <li>
+                    <strong>Anonymous journal information:</strong> before sign-in, journal data is stored in
+                    the browser's local storage on that device. It is not automatically transferred into an
+                    account.
+                </li>
+                <li>
+                    <strong>Operational information:</strong> the hosting platform and service providers may
+                    process connection and diagnostic information needed to run, secure, and troubleshoot the
+                    service. The exact log fields and retention periods depend on hosting configuration and
+                    have not been confirmed for this page.
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>How information is used</h2>
+            <p>
+                Account information is used to create accounts and authenticate users. Journal information is
+                used to save and display your journals. Technical and diagnostic information may be used to
+                operate, protect, and troubleshoot the application.
+            </p>
+        </section>
+
+        <section>
+            <h2>Storage and service providers</h2>
+            <p>
+                The application uses PostgreSQL for its database. The production database provider and
+                processing region are determined by deployment configuration and must be confirmed by the
+                operator. In production, Data Protection keys are configured to persist in Azure Blob Storage;
+                the application also uses Azure App Service diagnostics. Google sign-in is optional and is
+                available only when configured.
+            </p>
+            <p>
+                The application loads some third-party resources, including Google Fonts and GSAP from
+                jsDelivr. A browser may contact those providers when loading pages that use those resources.
+                Their own privacy terms apply to information they receive.
+            </p>
+            <p>
+                The application source does not show an analytics integration. Hosting, database, CDN, or
+                identity-provider logging and processing should be checked in the deployed service settings.
+                The locations where those providers process or store information have not been confirmed here.
+            </p>
+        </section>
+
+        <section>
+            <h2>Cookies and browser storage</h2>
+            <p>
+                The service uses cookies for authentication and session functionality, and antiforgery tokens
+                to protect form submissions. Optional Google sign-in uses a short-lived external sign-in
+                cookie when configured. Anonymous journal content is kept in local storage, not a cookie.
+                See the <a href="/cookies">Cookie Policy</a> for more detail.
+            </p>
+        </section>
+
+        <section>
+            <h2>Retention and deletion</h2>
+            <p>
+                Account and journal records remain in the application database until deleted or otherwise
+                removed by the operator. Signed-in users can request deletion using the account deletion
+                function in the application; deleting the account also deletes its journals and entries
+                through the database's configured relationships. Copies in backups, diagnostic logs, or
+                provider systems may remain until their applicable retention and deletion processes remove
+                them. Those periods have not been verified and should be confirmed before launch.
+            </p>
+        </section>
+
+        <section>
+            <h2>Your choices and requests</h2>
+            <p>
+                You can edit journal information in the application and delete your account from the account
+                deletion page. To ask a privacy question or make another data request, contact the operator
+                using the address on the <a href="/contact">Contact &amp; Support</a> page. The email shown
+                there is currently a placeholder and must be replaced before launch.
+            </p>
+            <p>
+                Privacy requirements may vary depending on where you live and how the service is offered.
+                This page does not determine whether a particular law applies or claim compliance with any
+                law. The operator should obtain appropriate legal advice and complete the missing provider,
+                location, retention, identity, and contact details.
+            </p>
+        </section>
+
+        <nav class="legal-page-links" aria-label="Other legal pages">
+            <a href="/terms">Terms of Service</a>
+            <a href="/cookies">Cookie Policy</a>
+            <a href="/contact">Contact &amp; Support</a>
+        </nav>
+    </article>
+</main>

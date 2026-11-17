@@ -285,7 +285,6 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\NoteKeepin
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\ref\NoteKeeping.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Pages\Journals.razor.rz.scp.css
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.Google.dll
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-y0y8cns7b8-y0y8cns7b8.gz
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Npgsql.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Pages\About.razor.rz.scp.css
@@ -303,5 +302,11 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\System.IO.
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\System.Memory.Data.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-lrt8j7ab80-lrt8j7ab80.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-lrt8j7ab80-lrt8j7ab80.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\Microsoft.Extensions.Logging.AzureAppServices.dll
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\Pages\Donate.razor.rz.scp.css
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\AngleSharp.dll
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\AngleSharp.Css.dll
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\HtmlSanitizer.dll
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-f8i0ws22bc-f8i0ws22bc.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-fp6xt010oc-fp6xt010oc.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-fp6xt010oc-fp6xt010oc.gz

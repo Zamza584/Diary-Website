@@ -6,13 +6,20 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100vh;
 }
 
 /* ========================================
    MAIN CONTENT AREA
    ======================================== */
 main[b-iysa7z3inu] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content[b-iysa7z3inu] {
   flex: 1;
 }
 
@@ -21,6 +28,35 @@ main[b-iysa7z3inu] {
    ======================================== */
 .sidebar[b-iysa7z3inu] {
   background-color: inherit;
+}
+
+.site-footer[b-iysa7z3inu] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 1rem clamp(1rem, 4vw, 2.5rem);
+  color: #4b586b;
+  background: #f4f2f2;
+  border-top: 1px solid #d5dbea;
+  font-size: 0.85rem;
+}
+
+.site-footer nav[b-iysa7z3inu] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.site-footer a[b-iysa7z3inu] {
+  color: #243d75;
+  text-underline-offset: 0.18em;
+}
+
+.site-footer a:focus-visible[b-iysa7z3inu] {
+  outline: 2px solid #325092;
+  outline-offset: 3px;
 }
 
 /* ========================================
@@ -111,6 +147,7 @@ main[b-iysa7z3inu] {
 
   .sidebar[b-iysa7z3inu] {
     height: 100vh;
+    flex: 0 0 180px;
     position: sticky;
     top: 0;
   }
@@ -126,6 +163,7 @@ main[b-iysa7z3inu] {
     text-align: right;
     width: 0;
   }
+
 }
 /* /Components/Layout/NavMenu.razor.rz.scp.css */
 .navigation[b-zlgbdk1gca] {
@@ -153,6 +191,9 @@ main[b-iysa7z3inu] {
    ======================================== */
 
 .nav-item[b-zlgbdk1gca] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
   font-size: 0.9rem;
   padding-bottom: 0.5rem;
 }
@@ -183,6 +224,68 @@ main[b-iysa7z3inu] {
 
 .nav-item[b-zlgbdk1gca]  .nav-about-link {
   margin-left: auto;
+}
+
+.nav-more-wrapper[b-zlgbdk1gca] {
+  position: relative;
+}
+
+.nav-more-button[b-zlgbdk1gca] {
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.nav-more-menu[b-zlgbdk1gca] {
+  position: absolute;
+  z-index: 30;
+  top: 50%;
+  right: calc(100% + 10px);
+  display: flex;
+  width: 154px;
+  flex-direction: column;
+  padding: 8px;
+  transform: translateY(-50%);
+  border-radius: 12px;
+  background: #1a293f;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.nav-more-menu[b-zlgbdk1gca]  .nav-link {
+  width: 100%;
+  height: 48px;
+  margin-top: 6px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.nav-more-menu[b-zlgbdk1gca]  .nav-link:first-child {
+  margin-top: 0;
+}
+
+.nav-logout-form[b-zlgbdk1gca] {
+  width: 100%;
+}
+
+.nav-item[b-zlgbdk1gca]  .nav-logout-button {
+  width: 100%;
+  height: 48px;
+  margin-top: 6px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.nav-item[b-zlgbdk1gca]  .nav-profile-link {
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;
+  align-self: center;
+  margin: auto auto 20px;
+  border-radius: 50%;
+  background: #325092;
+  font-size: 0.9rem;
 }
 
 /* Active Link State */
@@ -246,17 +349,47 @@ main[b-iysa7z3inu] {
   .navigation.open .navigation-links[b-zlgbdk1gca] {
     display: block;
   }
+
+  .nav-item[b-zlgbdk1gca] {
+    min-height: 0;
+  }
+
+  .nav-more-menu[b-zlgbdk1gca] {
+    position: static;
+    width: auto;
+    padding: 8px;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .nav-item[b-zlgbdk1gca]  .nav-profile-link {
+    margin: 18px auto 12px;
+  }
 }
 
 @media (min-width: 881px) {
   .navbar-toggler[b-zlgbdk1gca] {
     display: none;
   }
+
   .navigation[b-zlgbdk1gca] {
     display: block;
     width: 180px;
     height: 100vh;
     background-color: #1a293f;
+  }
+
+  .navigation-links[b-zlgbdk1gca],
+  .navigation-links > nav[b-zlgbdk1gca] {
+    height: 100%;
+  }
+
+  .nav-item[b-zlgbdk1gca] {
+    flex: 1;
+  }
+
+  .nav-more-wrapper[b-zlgbdk1gca] {
+    margin-top: 0;
   }
 }
 /* /Components/Layout/ReconnectModal.razor.rz.scp.css */
@@ -863,6 +996,136 @@ main[b-iysa7z3inu] {
     transition-duration: 0.01ms !important;
   }
 }
+/* /Pages/Donate.razor.rz.scp.css */
+.donate-page[b-y2jyo7zx5n] {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: clamp(24px, 6vw, 80px);
+  background:
+    radial-gradient(ellipse at 10% 12%, rgba(196, 213, 247, 0.58), transparent 28rem),
+    radial-gradient(ellipse at 90% 88%, rgba(244, 218, 198, 0.48), transparent 26rem),
+    #fbfaf7;
+  color: #1a293f;
+  font-family: "Inria Serif", Georgia, serif;
+}
+
+.donate-card[b-y2jyo7zx5n] {
+  width: min(100%, 720px);
+  padding: clamp(28px, 6vw, 64px);
+  border: 1px solid rgba(26, 41, 63, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 24px 70px rgba(26, 41, 63, 0.1);
+  text-align: center;
+}
+
+.donate-eyebrow[b-y2jyo7zx5n] {
+  margin: 0 0 16px;
+  color: #325092;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.donate-card h1[b-y2jyo7zx5n] {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.donate-intro[b-y2jyo7zx5n] {
+  max-width: 540px;
+  margin: 22px auto 0;
+  color: #576579;
+  font-size: 1.08rem;
+  line-height: 1.8;
+}
+
+.donate-notice[b-y2jyo7zx5n] {
+  margin-top: 32px;
+  padding: 22px;
+  border: 1px solid #d5dbea;
+  border-radius: 16px;
+  background: #f3f5fa;
+}
+
+.donate-notice h2[b-y2jyo7zx5n] {
+  margin: 0;
+  color: #243d75;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.donate-notice p[b-y2jyo7zx5n] {
+  margin: 10px 0 0;
+  color: #576579;
+  line-height: 1.7;
+}
+
+.donate-actions[b-y2jyo7zx5n] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.donate-button[b-y2jyo7zx5n] {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 20px;
+  border: 1px solid #325092;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.donate-button:hover[b-y2jyo7zx5n] {
+  transform: translateY(-2px);
+}
+
+.donate-button:focus-visible[b-y2jyo7zx5n] {
+  outline: 3px solid #8da8e2;
+  outline-offset: 4px;
+}
+
+.donate-button.primary[b-y2jyo7zx5n] {
+  background: #325092;
+  color: white;
+}
+
+.donate-button.primary:hover[b-y2jyo7zx5n] {
+  background: #243d75;
+}
+
+.donate-button.secondary[b-y2jyo7zx5n] {
+  background: transparent;
+  color: #325092;
+}
+
+.donate-button.secondary:hover[b-y2jyo7zx5n] {
+  background: #e8edf7;
+}
+
+@media (max-width: 520px) {
+  .donate-actions[b-y2jyo7zx5n] {
+    flex-direction: column;
+  }
+
+  .donate-button[b-y2jyo7zx5n] {
+    width: 100%;
+  }
+}
 /* /Pages/Home.razor.rz.scp.css */
 /* Vintage Edison Lightbulb Theme Styles */
 
@@ -910,6 +1173,12 @@ main[b-iysa7z3inu] {
   width: 144px;
   height: 105.85px;
   font-family: "Ingrid Darling", cursive;
+  text-decoration: none;
+}
+
+.logo:focus-visible[b-ujv6ega1qq] {
+  outline: 3px solid #325092;
+  outline-offset: 3px;
 }
 
 .logo p[b-ujv6ega1qq] {
@@ -1410,6 +1679,17 @@ main[b-iysa7z3inu] {
   margin-top: 18px;
 }
 
+.journal-action-icon[b-ujv6ega1qq] {
+  display: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .notes-saved[b-ujv6ega1qq] {
   display: grid;
   gap: 12px;
@@ -1599,13 +1879,22 @@ main[b-iysa7z3inu] {
   }
 
   .page-actions[b-ujv6ega1qq] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .page-actions .journal-action[b-ujv6ega1qq] {
-    min-height: 44px;
-    padding: 0.7rem 0.4rem;
-    font-size: 0.85rem;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0.55rem 0.25rem;
+  }
+
+  .journal-action-icon[b-ujv6ega1qq] {
+    display: block;
+  }
+
+  .journal-action-label[b-ujv6ega1qq] {
+    display: none;
   }
 
   .journal-area[b-ujv6ega1qq] {

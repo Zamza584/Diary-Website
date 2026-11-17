@@ -34,6 +34,34 @@
                 });
             };
 
+            window.animateMoreButton = (element) => {
+                if (!element || !window.gsap) return;
+                window.gsap.killTweensOf(element);
+                window.gsap.fromTo(element, { scale: 0.94 }, {
+                    scale: 1,
+                    duration: 0.28,
+                    ease: 'back.out(2.2)',
+                    clearProps: 'transform'
+                });
+            };
+
+            window.animateMoreMenu = (element) => {
+                if (!element || !window.gsap) return;
+                window.gsap.killTweensOf(element);
+                window.gsap.fromTo(element, {
+                    autoAlpha: 0,
+                    x: 14,
+                    scale: 0.97
+                }, {
+                    autoAlpha: 1,
+                    x: 0,
+                    scale: 1,
+                    duration: 0.22,
+                    ease: 'power2.out',
+                    clearProps: 'transform'
+                });
+            };
+
             window.getContentEditableHtml = (element) => {
                 if (!element) return '';
 
@@ -69,6 +97,67 @@
                 }
 
                 element.innerHTML = content;
+            };
+
+            window.preventUnsafeEditorPaste = (element) => {
+                if (!element || element.dataset.safePasteAttached === 'true') return;
+                element.dataset.safePasteAttached = 'true';
+                element.addEventListener('paste', (event) => {
+                    event.preventDefault();
+                    const selection = window.getSelection();
+                    if (!selection || selection.rangeCount === 0) return;
+
+                    const range = selection.getRangeAt(0);
+                    if (!element.contains(range.commonAncestorContainer)) return;
+
+                    const fragment = document.createDocumentFragment();
+                    const html = event.clipboardData?.getData('text/html') ?? '';
+                    if (html) {
+                        const template = document.createElement('template');
+                        template.innerHTML = html;
+                        const allowedTags = new Set(['b', 'br', 'div', 'em', 'h2', 'i', 'p', 'span', 'strong', 'u']);
+                        const sanitizeNode = (node) => {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                return document.createTextNode(node.nodeValue ?? '');
+                            }
+                            const children = Array.from(node.childNodes, sanitizeNode);
+                            if (node.nodeType !== Node.ELEMENT_NODE) {
+                                const unwrapped = document.createDocumentFragment();
+                                children.forEach(child => unwrapped.append(child));
+                                return unwrapped;
+                            }
+                            const tag = node.tagName.toLowerCase();
+                            if (!allowedTags.has(tag)) {
+                                const unwrapped = document.createDocumentFragment();
+                                children.forEach(child => unwrapped.append(child));
+                                return unwrapped;
+                            }
+                            const safeElement = document.createElement(tag);
+                            children.forEach(child => safeElement.append(child));
+                            return safeElement;
+                        };
+                        Array.from(template.content.childNodes, sanitizeNode)
+                            .forEach(child => fragment.append(child));
+                    } else {
+                        const text = event.clipboardData?.getData('text/plain') ?? '';
+                        text.split(/\r\n?|\n/).forEach((line, index) => {
+                            if (index > 0) fragment.append(document.createElement('br'));
+                            fragment.append(document.createTextNode(line));
+                        });
+                    }
+
+                    range.deleteContents();
+                    const lastNode = fragment.lastChild;
+                    range.insertNode(fragment);
+                    if (lastNode) {
+                        range.setStartAfter(lastNode);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                    element.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste' }));
+                });
+                element.addEventListener('drop', (event) => event.preventDefault());
             };
 
             window.formatContentEditableSelection = (element, format) => {

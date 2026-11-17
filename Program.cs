@@ -30,7 +30,8 @@ static ClaimsPrincipal CreateUserPrincipal(UserAccount user)
     var claims = new List<Claim>
     {
         new(ClaimTypes.Name, user.Name),
-        new(ClaimTypes.Email, user.Email)
+        new(ClaimTypes.Email, user.Email),
+        new(ClaimTypes.NameIdentifier, user.Id.ToString())
     };
 
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -187,6 +188,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddScoped<NotebookStorageService>();
+builder.Services.AddScoped<NotebookContentSanitizer>();
 builder.Services.AddSingleton<NoteTextEncryption>();
 builder.Services.AddSingleton<NotebookTitleEncryption>();
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -206,6 +208,17 @@ authenticationBuilder.AddCookie(CookieAuthenticationDefaults.AuthenticationSchem
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = GetSecureCookiePolicy(builder.Environment);
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.Events.OnValidatePrincipal = context =>
+    {
+        if (!int.TryParse(
+                context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier),
+                out _))
+        {
+            context.RejectPrincipal();
+        }
+
+        return Task.CompletedTask;
+    };
 });
 
 if (googleAuthenticationConfigured)
@@ -421,6 +434,40 @@ app.MapPost("/logout", async (HttpContext httpContext) =>
     httpContext.Session.Clear();
     return Results.Redirect("/");
 });
+
+app.MapPost("/account/delete", async (
+    HttpContext httpContext,
+    NoteKeepingDbContext dbContext,
+    [FromForm] string confirmation) =>
+{
+    if (!string.Equals(confirmation, "DELETE", StringComparison.Ordinal))
+    {
+        return Results.Redirect("/account/delete?error=confirmation");
+    }
+
+    var accountIdValue = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!int.TryParse(accountIdValue, out var accountId))
+    {
+        await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        httpContext.Session.Clear();
+        return Results.Redirect("/login");
+    }
+
+    var account = await dbContext.UserAccounts.SingleOrDefaultAsync(user => user.Id == accountId);
+    if (account is null)
+    {
+        await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        httpContext.Session.Clear();
+        return Results.Redirect("/login");
+    }
+
+    dbContext.UserAccounts.Remove(account);
+    await dbContext.SaveChangesAsync();
+    await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    httpContext.Session.Clear();
+
+    return Results.Redirect("/login?deleted=true");
+}).RequireAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
