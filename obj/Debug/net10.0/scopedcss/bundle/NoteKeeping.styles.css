@@ -259,6 +259,10 @@ main[b-iysa7z3inu] {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
+.nav-more-menu[hidden][b-zlgbdk1gca] {
+  display: none;
+}
+
 .nav-more-menu[b-zlgbdk1gca]  .nav-link {
   width: 100%;
   height: 48px;
@@ -1492,10 +1496,6 @@ main[b-iysa7z3inu] {
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 10px;
   height: 564px;
-}
-
-.journal-card > label[for="note-box"][b-ujv6ega1qq] {
-  display: none;
 }
 
 .journal-date-container[b-ujv6ega1qq],

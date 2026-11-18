@@ -333,10 +333,6 @@
   height: 564px;
 }
 
-.journal-card > label[for="note-box"][b-ujv6ega1qq] {
-  display: none;
-}
-
 .journal-date-container[b-ujv6ega1qq],
 .progress-bar[b-ujv6ega1qq] {
   flex: 0 0 auto;

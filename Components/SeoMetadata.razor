@@ -28,5 +28,5 @@
     public string Robots { get; set; } = "index, follow";
 
     private string CanonicalUrl =>
-        Navigation.ToAbsoluteUri(CanonicalPath.TrimStart('/')).GetLeftPart(UriPartial.Path);
+        new Uri(new Uri(Navigation.BaseUri), CanonicalPath.TrimStart('/')).GetLeftPart(UriPartial.Path);
 }

@@ -42,29 +42,26 @@
                             aria-controls="nav-more-menu" @ref="moreButtonRef" @onclick="ToggleMoreMenu">
                         More
                     </button>
-                    @if (isMoreMenuOpen)
-                    {
-                        <div class="nav-more-menu" id="nav-more-menu" @ref="moreMenuRef">
-                            <NavLink class="nav-link" href="/about" @onclick="CloseMenu">About</NavLink>
-                            <NavLink class="nav-link" href="/contact" @onclick="CloseMenu">Contact</NavLink>
-                            <NavLink class="nav-link" href="/donate" @onclick="CloseMenu">Donate</NavLink>
-                            <NavLink class="nav-link" href="/privacy" @onclick="CloseMenu">Legal &amp; Privacy</NavLink>
-                            <NavLink class="nav-link" href="/copyright" @onclick="CloseMenu">Copyright</NavLink>
-                            <AuthorizeView>
-                                <Authorized>
-                                    <NavLink class="nav-link" href="/account/delete" @onclick="CloseMenu">
-                                        Delete account
-                                    </NavLink>
-                                    <form method="post" action="/logout" class="nav-logout-form">
-                                        <AntiforgeryToken />
-                                        <button type="submit" class="nav-link nav-logout-button">
-                                            Logout
-                                        </button>
-                                    </form>
-                                </Authorized>
-                            </AuthorizeView>
-                        </div>
-                    }
+                    <div class="nav-more-menu" id="nav-more-menu" hidden="@(!isMoreMenuOpen)" @ref="moreMenuRef">
+                        <NavLink class="nav-link" href="/about" @onclick="CloseMenu">About</NavLink>
+                        <NavLink class="nav-link" href="/contact" @onclick="CloseMenu">Contact</NavLink>
+                        <NavLink class="nav-link" href="/donate" @onclick="CloseMenu">Donate</NavLink>
+                        <NavLink class="nav-link" href="/privacy" @onclick="CloseMenu">Legal &amp; Privacy</NavLink>
+                        <NavLink class="nav-link" href="/copyright" @onclick="CloseMenu">Copyright</NavLink>
+                        <AuthorizeView>
+                            <Authorized>
+                                <NavLink class="nav-link" href="/account/delete" @onclick="CloseMenu">
+                                    Delete account
+                                </NavLink>
+                                <form method="post" action="/logout" class="nav-logout-form">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="nav-link nav-logout-button">
+                                        Logout
+                                    </button>
+                                </form>
+                            </Authorized>
+                        </AuthorizeView>
+                    </div>
                 </div>
 
                 <NavLink class="nav-link nav-profile-link" href="/profile" Match="NavLinkMatch.All"

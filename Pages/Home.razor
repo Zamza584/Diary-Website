@@ -14,7 +14,7 @@
 </PageTitle>
 <SeoMetadata Title="@SeoTitle"
              Description="A calm, private online diary for writing, organizing, and returning to your thoughts."
-             CanonicalPath="@SeoCanonicalPath" Robots="noindex, nofollow" />
+             CanonicalPath="@SeoCanonicalPath" Robots="@SeoRobots" />
 
 @inject ThemeService ThemeService
 @inject NoteKeepingDbContext DbContext
@@ -85,13 +85,14 @@ else
                           
                         </div>
                     </div>
-                    <div class="progress-bar" aria-label="Notebook progress">
+                    <div class="progress-bar" role="progressbar" aria-label="Notebook progress"
+                         aria-valuemin="0" aria-valuemax="100" aria-valuenow="@NotebookProgress">
                         <span style="width: @NotebookProgress%"></span>
                     </div>
 
-                    <label for="note-box"></label>
                     <div class="journal-area @(isFirstPage ? "first-page-font" : "")" name="note" contenteditable="true"
-                         role="textbox" aria-multiline="true" data-placeholder="Write Something Interesting"
+                         role="textbox" aria-label="Journal entry" aria-multiline="true"
+                         data-placeholder="Write Something Interesting"
                          @oninput="HandleEditorInput" @onkeydown="HandleNoteKeyDown" @ref="editorRef" id="note-box"></div>
 
                     <div class="text-options">
@@ -204,8 +205,9 @@ else
     private ElementReference editorRef;
     private ElementReference previousPageButton;
     private ElementReference nextPageButton;
-    private string SeoTitle => JournalId.HasValue ? "Private journal | NoteKeeping" : "Private notes | NoteKeeping";
+    private string SeoTitle => JournalId.HasValue ? "Private journal | Comfidiario" : "Comfidiario | Private Journal";
     private string SeoCanonicalPath => JournalId.HasValue ? $"/journals/{JournalId.Value}" : "/";
+    private string SeoRobots => JournalId.HasValue ? "noindex, nofollow" : "index, follow";
     private string JournalHeading => JournalId.HasValue
         ? notebook?.Title ?? "Journal"
         : string.IsNullOrWhiteSpace(DisplayName) ? "Hello" : $"Hello, {DisplayName}";
