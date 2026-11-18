@@ -169,7 +169,7 @@
             return;
         }
 
-        var lowerEmail = normalizedEmail.ToLower();
+        var lowerEmail = normalizedEmail.ToLowerInvariant();
         var exists = await DbContext.UserAccounts.AnyAsync(u => u.Email.ToLower() == lowerEmail);
 
         if (exists)

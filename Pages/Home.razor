@@ -491,9 +491,26 @@ else
             await DbContext.SaveChangesAsync();
         }
 
+        var originalCurrentPage = notebook.CurrentPage;
+        var originalTotalPages = notebook.TotalPages;
+        var originalNoteCount = notebook.Notes.Count;
+        var originalFirstNoteDate = notebook.Notes
+            .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
+            .FirstOrDefault()?.Date;
+
         savedNotes = notebook.Notes.ToList();
         SetCurrentNote();
-        await StorageService.SaveNotebookAsync(notebook);
+        var normalizedFirstNoteDate = notebook.Notes
+            .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
+            .FirstOrDefault()?.Date;
+        if (notebook.CurrentPage != originalCurrentPage ||
+            notebook.TotalPages != originalTotalPages ||
+            notebook.Notes.Count != originalNoteCount ||
+            normalizedFirstNoteDate != originalFirstNoteDate)
+        {
+            await StorageService.SaveNotebookAsync(notebook);
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 
@@ -679,7 +696,7 @@ else
         if (string.IsNullOrEmpty(value))
         {
             currentNote.Date = notebook.CurrentPage == 1 ? DateTime.Today : null;
-            await StorageService.SaveNotebookAsync(notebook);
+            await StorageService.SaveNoteAsync(notebook, currentNote, currentNote.Text);
             return;
         }
 
@@ -699,7 +716,7 @@ else
         }
 
         currentNote.Date = selectedDate.Date;
-        await StorageService.SaveNotebookAsync(notebook);
+        await StorageService.SaveNoteAsync(notebook, currentNote, currentNote.Text);
     }
 
     private async Task HandlePreviousPageClick()

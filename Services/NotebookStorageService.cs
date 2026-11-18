@@ -20,6 +20,10 @@ public class NotebookStorageService
     private readonly IJSRuntime _jsRuntime;
     private readonly NotebookContentSanitizer _contentSanitizer;
     private readonly SemaphoreSlim _anonymousStorageLock = new(1, 1);
+    private static readonly JsonSerializerOptions AnonymousNotebookJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
     private const string AnonymousNotebookKey = "anon-notebook";
 
     public NotebookStorageService(
@@ -225,10 +229,7 @@ public class NotebookStorageService
             if (string.IsNullOrEmpty(json))
                 return null;
 
-            var notebook = JsonSerializer.Deserialize<Notebook>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var notebook = JsonSerializer.Deserialize<Notebook>(json, AnonymousNotebookJsonOptions);
 
             if (notebook == null)
             {
@@ -325,23 +326,38 @@ public class NotebookStorageService
         }
 
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        var trackedNotebook = await dbContext.Notebooks
-            .Include(n => n.Notes)
-            .SingleOrDefaultAsync(n => n.Id == notebook.Id && n.UserAccountId == accountId.Value);
-        if (trackedNotebook is null)
+        var sanitizedText = _contentSanitizer.Sanitize(noteText);
+        Notebook trackedNotebook;
+        Note? trackedNote = null;
+
+        if (currentNote.Id == 0)
         {
-            return;
+            var notebookRecord = await dbContext.Notebooks
+                .SingleOrDefaultAsync(n => n.Id == notebook.Id && n.UserAccountId == accountId.Value);
+            if (notebookRecord is null)
+            {
+                return;
+            }
+
+            trackedNotebook = notebookRecord;
+        }
+        else
+        {
+            trackedNote = await dbContext.Notes
+                .Include(n => n.Notebook)
+                .SingleOrDefaultAsync(n =>
+                    n.Id == currentNote.Id &&
+                    n.NotebookId == notebook.Id &&
+                    n.Notebook!.UserAccountId == accountId.Value);
+            if (trackedNote?.Notebook is null)
+            {
+                throw new InvalidOperationException("The note does not belong to the current notebook.");
+            }
+
+            trackedNotebook = trackedNote.Notebook;
         }
 
-        var sanitizedText = _contentSanitizer.Sanitize(noteText);
-        trackedNotebook.CurrentPage = Math.Clamp(notebook.CurrentPage, 1, notebook.TotalPages);
-        var trackedNote = currentNote.Id == 0
-            ? null
-            : trackedNotebook.Notes.SingleOrDefault(n => n.Id == currentNote.Id);
-        if (currentNote.Id != 0 && trackedNote is null)
-        {
-            throw new InvalidOperationException("The note does not belong to the current notebook.");
-        }
+        trackedNotebook.CurrentPage = Math.Clamp(notebook.CurrentPage, 1, Math.Max(1, trackedNotebook.TotalPages));
 
         if (trackedNote is not null)
         {
@@ -351,8 +367,9 @@ public class NotebookStorageService
         else
         {
             currentNote.Text = sanitizedText;
-            currentNote.NotebookId = notebook.Id;
-            trackedNotebook.Notes.Add(currentNote);
+            currentNote.NotebookId = trackedNotebook.Id;
+            currentNote.Notebook = trackedNotebook;
+            dbContext.Notes.Add(currentNote);
         }
 
         await dbContext.SaveChangesAsync();

@@ -444,9 +444,9 @@ app.MapPost("/login", async (
         return Results.Redirect("/login?error=missing");
     }
 
-    var normalizedEmail = email.Trim();
+    var normalizedEmail = email.Trim().ToLowerInvariant();
     var user = await dbContext.UserAccounts
-        .SingleOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail.ToLower());
+        .SingleOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
     if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
     {
