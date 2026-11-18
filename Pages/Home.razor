@@ -562,38 +562,7 @@ else
             return;
         }
 
-        isNavigatingPage = true;
-        try
-        {
-            hasManualSave = true;
-            await SaveNote();
-
-            var orderedNotes = notebook.Notes
-                .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
-                .ToList();
-            var targetPageNumber = notebook.CurrentPage + 1;
-            var targetIndex = targetPageNumber - 1;
-            var destinationNote = targetIndex < orderedNotes.Count
-                ? orderedNotes[targetIndex]
-                : new Note
-                {
-                    NotebookId = notebook.Id,
-                    Notebook = notebook
-                };
-            if (!notebook.Notes.Contains(destinationNote))
-            {
-                notebook.Notes.Add(destinationNote);
-            }
-
-            notebook.CurrentPage = targetPageNumber;
-            SetCurrentNote();
-            dateHighlightSequence++;
-            await StorageService.SaveNotebookAsync(notebook);
-        }
-        finally
-        {
-            isNavigatingPage = false;
-        }
+        await NavigateToPageAsync(notebook.CurrentPage + 1, highlightDate: true);
     }
 
     public async Task PreviousPage()
@@ -608,19 +577,7 @@ else
             return;
         }
 
-        isNavigatingPage = true;
-        try
-        {
-            hasManualSave = true;
-            await SaveNote();
-            notebook.CurrentPage--;
-            SetCurrentNote();
-            await StorageService.SaveNotebookAsync(notebook);
-        }
-        finally
-        {
-            isNavigatingPage = false;
-        }
+        await NavigateToPageAsync(notebook.CurrentPage - 1);
     }
 
     private async Task HandlePageNumberChange(ChangeEventArgs args)
@@ -635,18 +592,79 @@ else
             return;
         }
 
+        await NavigateToPageAsync(targetPage, highlightDate: true);
+    }
+
+    private async Task NavigateToPageAsync(int targetPage, bool highlightDate = false)
+    {
+        if (notebook is null || currentNote is null || isNavigatingPage ||
+            targetPage < 1 || targetPage > notebook.TotalPages || targetPage == notebook.CurrentPage)
+        {
+            return;
+        }
+
         isNavigatingPage = true;
+        typingSaveCancellation?.Cancel();
+        await noteSaveLock.WaitAsync();
+
         try
         {
             hasManualSave = true;
-            await SaveNote();
-            notebook.CurrentPage = targetPage;
+            var orderedNotes = notebook.Notes
+                .OrderBy(note => note.Id == 0 ? int.MaxValue : note.Id)
+                .ToList();
+            while (orderedNotes.Count < targetPage)
+            {
+                var newNote = new Note
+                {
+                    Date = orderedNotes.Count == 0 ? DateTime.Today : null,
+                    NotebookId = notebook.Id,
+                    Notebook = notebook
+                };
+                notebook.Notes.Add(newNote);
+                orderedNotes.Add(newNote);
+            }
+
+            var newText = textValue ?? string.Empty;
+            var noteChanged = !string.Equals(currentNote.Text, newText, StringComparison.Ordinal);
+            if (noteChanged)
+            {
+                isSaving = true;
+                isSaved = false;
+                StateHasChanged();
+            }
+
+            try
+            {
+                await StorageService.SavePageNavigationAsync(notebook, currentNote, newText, targetPage);
+
+                if (noteChanged && hasManualSave)
+                {
+                    isSaved = true;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            finally
+            {
+                if (noteChanged)
+                {
+                    isSaving = false;
+                    if (hasManualSave)
+                    {
+                        _ = TriggerSavedResetAsync();
+                    }
+                }
+            }
+
             SetCurrentNote();
-            dateHighlightSequence++;
-            await StorageService.SaveNotebookAsync(notebook);
+            if (highlightDate)
+            {
+                dateHighlightSequence++;
+            }
         }
         finally
         {
+            noteSaveLock.Release();
             isNavigatingPage = false;
         }
     }

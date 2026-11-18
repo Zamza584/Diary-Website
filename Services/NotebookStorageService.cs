@@ -96,6 +96,32 @@ public class NotebookStorageService
         }
     }
 
+    public async Task SavePageNavigationAsync(
+        Notebook notebook,
+        Note currentNote,
+        string noteText,
+        int targetPage)
+    {
+        if (targetPage < 1 || targetPage > notebook.TotalPages)
+        {
+            throw new ArgumentOutOfRangeException(nameof(targetPage));
+        }
+
+        var sanitizedText = _contentSanitizer.Sanitize(noteText);
+        var isAuthenticated = await IsAuthenticatedAsync();
+
+        if (isAuthenticated)
+        {
+            await SavePageNavigationToDatabaseAsync(notebook, currentNote, sanitizedText, targetPage);
+        }
+        else
+        {
+            currentNote.Text = sanitizedText;
+            notebook.CurrentPage = targetPage;
+            await SaveNotebookToLocalStorageAsync(notebook);
+        }
+    }
+
     /// <summary>
     /// Clears all anonymous notebook data from browser localStorage.
     /// Called on logout or auth state change.
@@ -331,6 +357,82 @@ public class NotebookStorageService
 
         await dbContext.SaveChangesAsync();
         currentNote.Text = sanitizedText;
+    }
+
+    private async Task SavePageNavigationToDatabaseAsync(
+        Notebook notebook,
+        Note currentNote,
+        string noteText,
+        int targetPage)
+    {
+        var accountId = await GetAuthenticatedUserAccountIdAsync();
+        if (!accountId.HasValue)
+        {
+            throw new InvalidOperationException("The authenticated account could not be resolved.");
+        }
+
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        Notebook trackedNotebook;
+        Note? trackedNote = null;
+
+        if (currentNote.Id == 0)
+        {
+            var notebookRecord = await dbContext.Notebooks
+                .SingleOrDefaultAsync(n => n.Id == notebook.Id && n.UserAccountId == accountId.Value);
+            if (notebookRecord is null)
+            {
+                throw new InvalidOperationException("The current notebook could not be found.");
+            }
+
+            trackedNotebook = notebookRecord;
+        }
+        else
+        {
+            trackedNote = await dbContext.Notes
+                .Include(n => n.Notebook)
+                .SingleOrDefaultAsync(n =>
+                    n.Id == currentNote.Id &&
+                    n.NotebookId == notebook.Id &&
+                    n.Notebook!.UserAccountId == accountId.Value);
+            if (trackedNote?.Notebook is null)
+            {
+                throw new InvalidOperationException("The current note could not be found in this notebook.");
+            }
+
+            trackedNotebook = trackedNote.Notebook;
+        }
+
+        if (targetPage > trackedNotebook.TotalPages)
+        {
+            throw new InvalidOperationException("The requested page is outside the notebook.");
+        }
+
+        trackedNotebook.CurrentPage = targetPage;
+
+        if (trackedNote is null)
+        {
+            currentNote.Text = noteText;
+            currentNote.NotebookId = trackedNotebook.Id;
+            currentNote.Notebook = trackedNotebook;
+            dbContext.Notes.Add(currentNote);
+        }
+        else
+        {
+            trackedNote.Text = noteText;
+            trackedNote.Date = currentNote.Date;
+            currentNote.Text = noteText;
+        }
+
+        foreach (var note in notebook.Notes.Where(note => note.Id == 0 && !ReferenceEquals(note, currentNote)))
+        {
+            note.Text = _contentSanitizer.Sanitize(note.Text);
+            note.NotebookId = trackedNotebook.Id;
+            note.Notebook = trackedNotebook;
+            dbContext.Notes.Add(note);
+        }
+
+        await dbContext.SaveChangesAsync();
+        notebook.CurrentPage = targetPage;
     }
 
     private async Task SaveNotebookToDatabaseAsync(Notebook notebook)
