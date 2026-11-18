@@ -24,6 +24,7 @@ public class NoteKeepingDbContext : DbContext
     public DbSet<Note> Notes => Set<Note>();
     public DbSet<UserAccount> UserAccounts => Set<UserAccount>();
     public DbSet<CopyrightNotice> CopyrightNotices => Set<CopyrightNotice>();
+    public DbSet<Suggestion> Suggestions => Set<Suggestion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -94,6 +95,17 @@ public class NoteKeepingDbContext : DbContext
             entity.Property(n => n.Signature).IsRequired();
             entity.Property(n => n.Status).IsRequired();
             entity.Property(n => n.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
+        });
+
+        modelBuilder.Entity<Suggestion>(entity =>
+        {
+            entity.HasKey(suggestion => suggestion.Id);
+            entity.Property(suggestion => suggestion.Message)
+                .HasMaxLength(Suggestion.MaxMessageLength)
+                .IsRequired();
+            entity.Property(suggestion => suggestion.CreatedAt)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
         });
     }
 }

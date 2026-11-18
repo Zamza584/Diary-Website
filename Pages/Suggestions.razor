@@ -1,0 +1,49 @@
+@page "/suggestions"
+
+<PageTitle>Suggestions | Comfidiario</PageTitle>
+<SeoMetadata Title="Suggestions | Comfidiario"
+             Description="Share an idea to help improve Comfidiario."
+             CanonicalPath="/suggestions"
+             Robots="index, follow" />
+
+<main class="legal-page">
+    <article class="legal-document">
+        <p class="legal-eyebrow">Help us improve</p>
+        <h1>Share a suggestion</h1>
+        <p>Have an idea that could make Comfidiario better? We’d love to hear it.</p>
+        <p class="legal-note">Please do not include passwords, private journal entries, or other sensitive information. Suggestions are stored for review and are not linked to your account.</p>
+
+        @if (Submitted)
+        {
+            <p class="profile-success" role="status">Thank you. Your suggestion has been received.</p>
+        }
+        else if (Error == "rate-limited")
+        {
+            <p class="profile-error" role="alert">Too many suggestions were submitted recently. Please try again later.</p>
+        }
+        else if (Error == "invalid")
+        {
+            <p class="profile-error" role="alert">Enter a suggestion of up to 5,000 characters.</p>
+        }
+
+        <form method="post" action="/suggestions/submit" class="auth-form">
+            <AntiforgeryToken />
+            <div class="auth-field">
+                <label for="suggestion-message">Your suggestion</label>
+                <textarea class="auth-input" id="suggestion-message" name="suggestion"
+                          maxlength="5000" required></textarea>
+            </div>
+            <button class="auth-button auth-button-primary" type="submit">Send suggestion</button>
+        </form>
+
+        <nav class="legal-page-links" aria-label="Related pages">
+            <a href="/contact">Contact &amp; Support</a>
+            <a href="/">Return to your diary</a>
+        </nav>
+    </article>
+</main>
+
+@code {
+    [SupplyParameterFromQuery] public bool Submitted { get; set; }
+    [SupplyParameterFromQuery] public string? Error { get; set; }
+}

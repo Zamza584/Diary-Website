@@ -419,8 +419,7 @@
   margin-top: 1.5rem;
 }
 
-.privacy-settings,
-.copyright-form {
+.privacy-settings {
   margin-top: 1.25rem;
   padding: 1.1rem;
   border: 1px solid #dfe4ee;
@@ -428,8 +427,7 @@
   background: #fff;
 }
 
-.privacy-settings h2,
-.copyright-form h2 {
+.privacy-settings h2 {
   margin: 0 0 0.65rem;
   color: #243d75;
   font-family: Georgia, "Times New Roman", serif;
@@ -461,12 +459,6 @@
   margin: 0.75rem 0 0;
   color: #28643b;
   font-weight: 700;
-}
-
-.copyright-form textarea {
-  min-height: 110px;
-  resize: vertical;
-  font-family: inherit;
 }
 
 .profile-error {

@@ -128,6 +128,27 @@ namespace NoteKeeping.Migrations
                     b.ToTable("Notebooks");
                 });
 
+            modelBuilder.Entity("NoteKeeping.Models.Suggestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Suggestions");
+                });
+
             modelBuilder.Entity("NoteKeeping.Models.UserAccount", b =>
                 {
                     b.Property<int>("Id")

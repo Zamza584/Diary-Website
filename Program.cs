@@ -269,7 +269,10 @@ builder.Services.AddRateLimiter(options =>
             context.HttpContext.Response.Headers.RetryAfter = retryAfter.TotalSeconds.ToString("0");
         }
 
-        context.HttpContext.Response.Redirect("/login?error=rate-limited");
+        var redirectPath = context.HttpContext.Request.Path.StartsWithSegments("/suggestions/submit")
+            ? "/suggestions?error=rate-limited"
+            : "/login?error=rate-limited";
+        context.HttpContext.Response.Redirect(redirectPath);
     };
 
     options.AddPolicy("login", httpContext =>
@@ -290,7 +293,7 @@ builder.Services.AddRateLimiter(options =>
         });
     });
 
-    options.AddPolicy("copyright", httpContext =>
+    options.AddPolicy("suggestions", httpContext =>
     {
         var remoteIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         return RateLimitPartition.GetFixedWindowLimiter(remoteIp, _ => new FixedWindowRateLimiterOptions
@@ -301,6 +304,7 @@ builder.Services.AddRateLimiter(options =>
             AutoReplenishment = true
         });
     });
+
 });
 
 var app = builder.Build();
@@ -631,42 +635,24 @@ app.MapGet("/account/export", async (
         $"comfidiario-data-export-{DateTime.UtcNow:yyyy-MM-dd}.json");
 }).RequireAuthorization();
 
-app.MapPost("/copyright/notice", async (
-    HttpContext httpContext,
+app.MapPost("/suggestions/submit", async (
     NoteKeepingDbContext dbContext,
-    [FromForm] string reporterName,
-    [FromForm] string reporterEmail,
-    [FromForm] string copyrightWork,
-    [FromForm] string infringingUrl,
-    [FromForm] string explanation,
-    [FromForm] string signature,
-    [FromForm] bool accuracy,
-    [FromForm] bool authority) =>
+    [FromForm] string suggestion) =>
 {
-    if (new[] { reporterName, reporterEmail, copyrightWork, infringingUrl, explanation, signature }
-        .Any(string.IsNullOrWhiteSpace) ||
-        !accuracy ||
-        !authority)
+    var message = suggestion.Trim();
+    if (string.IsNullOrWhiteSpace(message) || message.Length > Suggestion.MaxMessageLength)
     {
-        return Results.Redirect("/copyright?error=incomplete");
+        return Results.Redirect("/suggestions?error=invalid");
     }
 
-    var notice = new CopyrightNotice
+    dbContext.Suggestions.Add(new Suggestion
     {
-        ReporterName = reporterName.Trim(),
-        ReporterEmail = reporterEmail.Trim(),
-        CopyrightWork = copyrightWork.Trim(),
-        InfringingUrl = infringingUrl.Trim(),
-        Explanation = explanation.Trim(),
-        Signature = signature.Trim(),
-        AccuracyDeclarationAccepted = accuracy,
-        AuthorityDeclarationAccepted = authority,
+        Message = message,
         CreatedAt = DateTime.UtcNow
-    };
-    dbContext.CopyrightNotices.Add(notice);
+    });
     await dbContext.SaveChangesAsync();
-    return Results.Redirect("/copyright?received=true");
-}).RequireRateLimiting("copyright");
+    return Results.Redirect("/suggestions?submitted=true");
+}).RequireRateLimiting("suggestions");
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
