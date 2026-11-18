@@ -307,6 +307,6 @@ C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\scopedcss\
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\AngleSharp.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\AngleSharp.Css.dll
 C:\Users\Jupiter\Documents\web-projects\NoteKeeping\bin\Debug\net10.0\HtmlSanitizer.dll
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-ljwk4z2emk-ljwk4z2emk.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-dik0lcszk1-dik0lcszk1.gz
-C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-dik0lcszk1-dik0lcszk1.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\cezaehsv3s-{0}-bo0jzogm6l-bo0jzogm6l.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\xlqxadhaja-{0}-ju2gc4507o-ju2gc4507o.gz
+C:\Users\Jupiter\Documents\web-projects\NoteKeeping\obj\Debug\net10.0\compressed\osynb9spnz-{0}-ju2gc4507o-ju2gc4507o.gz
