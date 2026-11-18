@@ -29,6 +29,9 @@ jobs:
       - name: Clean Release output
         run: dotnet clean .\NoteKeeping.csproj --configuration Release
 
+      - name: Remove stale scoped CSS
+        run: if (Test-Path .\obj\Release\net10.0\scopedcss) { Remove-Item -Path .\obj\Release\net10.0\scopedcss -Recurse -Force }
+
       - name: Publish with dotnet
         run: dotnet publish .\NoteKeeping.csproj --configuration Release --output "${{env.DOTNET_ROOT}}/myapp"
 
