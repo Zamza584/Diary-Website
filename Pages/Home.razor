@@ -314,6 +314,11 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (JournalId.HasValue && notebook is null)
+        {
+            return;
+        }
+
         if (firstRender)
         {
             await JS.InvokeVoidAsync("preventUnsafeEditorPaste", editorRef);
@@ -404,6 +409,8 @@ else
             if (JournalId.HasValue)
             {
                 ClearNotebookState();
+                var returnUrl = Uri.EscapeDataString("/journals");
+                NavManager.NavigateTo($"/login?ReturnUrl={returnUrl}", forceLoad: true);
                 return;
             }
 

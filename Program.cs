@@ -25,6 +25,14 @@ static CookieSecurePolicy GetSecureCookiePolicy(IWebHostEnvironment environment)
     return environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
 }
 
+static bool IsLocalReturnUrl(string? url)
+{
+    return !string.IsNullOrEmpty(url) &&
+        url[0] == '/' &&
+        (url.Length == 1 || (url[1] != '/' && url[1] != '\\')) &&
+        !url.Contains('\\');
+}
+
 static ClaimsPrincipal CreateUserPrincipal(UserAccount user)
 {
     var claims = new List<Claim>
@@ -424,7 +432,12 @@ app.MapGet("/auth/google-callback", async (HttpContext httpContext, NoteKeepingD
     return Results.Redirect("/");
 });
 
-app.MapPost("/login", async (HttpContext httpContext, NoteKeepingDbContext dbContext, [FromForm] string email, [FromForm] string password) =>
+app.MapPost("/login", async (
+    HttpContext httpContext,
+    NoteKeepingDbContext dbContext,
+    [FromForm] string email,
+    [FromForm] string password,
+    [FromForm] string? returnUrl) =>
 {
     if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
     {
@@ -446,7 +459,8 @@ app.MapPost("/login", async (HttpContext httpContext, NoteKeepingDbContext dbCon
         ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
     });
 
-    return Results.Redirect("/");
+    var destination = IsLocalReturnUrl(returnUrl) ? returnUrl! : "/";
+    return Results.LocalRedirect(destination);
 }).RequireRateLimiting("login");
 
 app.MapPost("/logout", async (HttpContext httpContext) =>

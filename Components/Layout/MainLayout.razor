@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
-<div class="page">
+<div class="page @(IsJournalPage ? "journal-home" : string.Empty)">
     <div>
 @* logo *@
     </div>
@@ -31,4 +32,21 @@
 </div>
 
 @code {
+    private bool IsJournalPage
+    {
+        get
+        {
+            var routePath = Navigation.ToBaseRelativePath(Navigation.Uri);
+            var queryIndex = routePath.IndexOf('?');
+            if (queryIndex >= 0)
+            {
+                routePath = routePath[..queryIndex];
+            }
+
+            routePath = routePath.Trim('/');
+            return string.IsNullOrEmpty(routePath) ||
+                (routePath.StartsWith("journals/", StringComparison.OrdinalIgnoreCase) &&
+                 int.TryParse(routePath["journals/".Length..], out _));
+        }
+    }
 }

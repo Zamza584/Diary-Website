@@ -26,7 +26,7 @@ main {
    SIDEBAR
    ======================================== */
 .sidebar {
-  background-color: inherit;
+  background-color: transparent;
 }
 
 .site-footer {
@@ -122,10 +122,17 @@ main {
    ======================================== */
 @media (max-width: 880.98px) {
   .sidebar {
+    order: -1;
+    align-self: flex-end;
+    margin: 14px 16px 8px 0;
+    z-index: 20;
+  }
+
+  .page.journal-home .sidebar {
     position: absolute;
     top: 14px;
     right: 16px;
-    z-index: 20;
+    margin: 0;
   }
 
   .top-row {

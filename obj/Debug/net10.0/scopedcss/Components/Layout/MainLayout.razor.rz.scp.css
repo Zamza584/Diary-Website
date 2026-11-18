@@ -26,7 +26,7 @@ main[b-iysa7z3inu] {
    SIDEBAR
    ======================================== */
 .sidebar[b-iysa7z3inu] {
-  background-color: inherit;
+  background-color: transparent;
 }
 
 .site-footer[b-iysa7z3inu] {
@@ -122,10 +122,17 @@ main[b-iysa7z3inu] {
    ======================================== */
 @media (max-width: 880.98px) {
   .sidebar[b-iysa7z3inu] {
+    order: -1;
+    align-self: flex-end;
+    margin: 14px 16px 8px 0;
+    z-index: 20;
+  }
+
+  .page.journal-home .sidebar[b-iysa7z3inu] {
     position: absolute;
     top: 14px;
     right: 16px;
-    z-index: 20;
+    margin: 0;
   }
 
   .top-row[b-iysa7z3inu] {

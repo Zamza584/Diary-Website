@@ -34,6 +34,7 @@
 
             <form class="auth-form" method="post" action="/login">
                 <AntiforgeryToken />
+                <input type="hidden" name="returnUrl" value="@ReturnUrl">
                 <div class="auth-field">
                     <label for="email">Email</label>
                     <input class="auth-input" type="email" name="email" id="email" @bind="Email"
@@ -79,6 +80,9 @@
 
     [SupplyParameterFromQuery]
     public bool Deleted { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
 
     private string Email { get; set; } = string.Empty;
     private string Password { get; set; } = string.Empty;

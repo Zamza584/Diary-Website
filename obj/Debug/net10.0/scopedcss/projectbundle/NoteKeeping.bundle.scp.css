@@ -27,7 +27,7 @@ main[b-iysa7z3inu] {
    SIDEBAR
    ======================================== */
 .sidebar[b-iysa7z3inu] {
-  background-color: inherit;
+  background-color: transparent;
 }
 
 .site-footer[b-iysa7z3inu] {
@@ -123,10 +123,17 @@ main[b-iysa7z3inu] {
    ======================================== */
 @media (max-width: 880.98px) {
   .sidebar[b-iysa7z3inu] {
+    order: -1;
+    align-self: flex-end;
+    margin: 14px 16px 8px 0;
+    z-index: 20;
+  }
+
+  .page.journal-home .sidebar[b-iysa7z3inu] {
     position: absolute;
     top: 14px;
     right: 16px;
-    z-index: 20;
+    margin: 0;
   }
 
   .top-row[b-iysa7z3inu] {
@@ -280,9 +287,9 @@ main[b-iysa7z3inu] {
 }
 
 .nav-item[b-zlgbdk1gca]  .nav-profile-link {
-  width: 80px;
-  height: 80px;
-  flex: 0 0 80px;
+  width: 96px;
+  height: 96px;
+  flex: 0 0 96px;
   align-self: center;
   margin: auto auto 20px;
   border-radius: 50%;
@@ -1253,6 +1260,7 @@ main[b-iysa7z3inu] {
   font-size: clamp(2.2rem, 4vw, 3.2rem);
   line-height: 1.1;
   font-family: "Inria Serif", serif;
+  font-style: italic;
 }
 
 .journal-subtitle[b-ujv6ega1qq] {
@@ -1313,7 +1321,7 @@ main[b-iysa7z3inu] {
   display: inline-flex;
   align-items: center;
   padding: 8px 12px;
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   color: #40342f;
   font-weight: 600;
 }
@@ -1489,7 +1497,7 @@ main[b-iysa7z3inu] {
   background: transparent;
   color: #504339;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
 }
 
 .journal-date-placeholder[b-ujv6ega1qq] {
@@ -1550,7 +1558,7 @@ main[b-iysa7z3inu] {
   overflow-y: auto;
   background-color: rgba(255, 255, 255, 0.96);
   color: #333333;
-  font-size: 1rem;
+  font-size: 1.5rem;
   line-height: 1.6;
   font-family: "Inria Serif", serif;
 }
@@ -1731,7 +1739,7 @@ main[b-iysa7z3inu] {
     height: auto;
     min-height: 100vh;
     min-height: 100svh;
-    padding: 16px 10px 28px;
+    padding: 14px 10px 28px;
   }
 
   .logo[b-ujv6ega1qq] {
@@ -1788,7 +1796,7 @@ main[b-iysa7z3inu] {
 
   .page-indicator[b-ujv6ega1qq],
   .journal-meta[b-ujv6ega1qq] {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .journal-date-container[b-ujv6ega1qq] {
@@ -1880,7 +1888,7 @@ main[b-iysa7z3inu] {
 
   .journal-date[b-ujv6ega1qq] {
     max-width: 100%;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .page-actions[b-ujv6ega1qq] {

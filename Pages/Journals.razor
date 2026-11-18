@@ -145,7 +145,7 @@
 }
 
 @code {
-    private const int MaximumJournals = 20;
+    private const int MaximumJournals = 5;
 
     private List<Notebook> journals = new();
     private int? userAccountId;
@@ -193,6 +193,29 @@
             .OrderBy(n => n.Date)
             .ThenBy(n => n.Id)
             .ToListAsync();
+
+        if (journals.Count == 0)
+        {
+            var defaultJournal = new Notebook
+            {
+                Title = "My Diary",
+                Date = DateTime.Today,
+                CurrentPage = 1,
+                TotalPages = 20,
+                UserAccountId = userAccount.Id,
+                Notes = Enumerable.Range(0, 20)
+                    .Select(index => new Note
+                    {
+                        Date = index == 0 ? DateTime.Today : null,
+                        Text = index == 0 ? "Journal" : string.Empty
+                    })
+                    .ToList()
+            };
+
+            DbContext.Notebooks.Add(defaultJournal);
+            await DbContext.SaveChangesAsync();
+            journals.Add(defaultJournal);
+        }
     }
 
     private void OpenCreateJournalDialog()
