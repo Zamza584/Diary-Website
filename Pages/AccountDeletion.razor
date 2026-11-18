@@ -1,5 +1,5 @@
 @page "/account/delete"
-@attribute [Authorize]
+@attribute [Authorize(Policy = "AdultConfirmed")]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 

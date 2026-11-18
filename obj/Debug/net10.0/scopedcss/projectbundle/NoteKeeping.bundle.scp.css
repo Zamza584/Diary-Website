@@ -31,6 +31,8 @@ main[b-iysa7z3inu] {
 }
 
 .site-footer[b-iysa7z3inu] {
+  position: static;
+  bottom: auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1200,7 +1202,8 @@ main[b-iysa7z3inu] {
 .journal-page-shell[b-ujv6ega1qq] {
   position: relative;
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   width: 100%;
   font-family: "Inria Serif", "serif";
 }
@@ -1272,7 +1275,8 @@ main[b-iysa7z3inu] {
 
 .journal-section[b-ujv6ega1qq] {
   width: 700px;
-  height: 637px;
+  min-height: 637px;
+  height: auto;
   background: rgba(255, 255, 255, 0.9);
   margin: 70px auto 30px;
   padding: 0 20px;
@@ -1727,7 +1731,7 @@ main[b-iysa7z3inu] {
     height: auto;
     min-height: 100vh;
     min-height: 100svh;
-    padding: 16px 14px 28px;
+    padding: 16px 10px 28px;
   }
 
   .logo[b-ujv6ega1qq] {
@@ -1749,6 +1753,7 @@ main[b-iysa7z3inu] {
     width: 100%;
     max-width: 602px;
     height: auto;
+    min-height: 0;
     margin: 24px auto 0;
     padding: 0 0;
   }
@@ -1808,7 +1813,7 @@ main[b-iysa7z3inu] {
     box-sizing: border-box;
     height: auto;
     min-height: 0;
-    padding: 16px;
+    padding: 12px;
   }
 
   .journal-area[b-ujv6ega1qq] {
@@ -1856,12 +1861,12 @@ main[b-iysa7z3inu] {
 
 @media (max-width: 560px) {
   .journal-page-shell[b-ujv6ega1qq] {
-    padding-right: 12px;
-    padding-left: 12px;
+    padding-right: 8px;
+    padding-left: 8px;
   }
 
   .journal-card[b-ujv6ega1qq] {
-    padding: 12px;
+    padding: 6px;
   }
 
   .journal-date-container[b-ujv6ega1qq] {
@@ -2089,6 +2094,7 @@ main[b-iysa7z3inu] {
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
+    text-decoration: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
@@ -2141,7 +2147,8 @@ main[b-iysa7z3inu] {
 .journal-cover-item[b-0va9pqgd4z] {
     position: relative;
     width: 100%;
-    height: 166px;
+    height: auto;
+    aspect-ratio: 118 / 166;
     overflow: hidden;
     border: 1px solid rgb(79 43 43 / 12%);
     border-radius: 7px;

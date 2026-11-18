@@ -45,9 +45,53 @@
                     <dd><time datetime="@account.CreatedAt.ToString("yyyy-MM-dd")">@account.CreatedAt.ToString("MMMM d, yyyy")</time></dd>
                 </div>
             </dl>
+
+            @if (!account.AgeConfirmed)
+            {
+                <form method="post" action="/account/age-confirmation" class="privacy-settings">
+                    <AntiforgeryToken />
+                    <h2>Age confirmation required</h2>
+                    <p>This service is for adults. Confirm that you are at least 18, or have valid consent from a parent or legal guardian.</p>
+                    <label class="consent-check">
+                        <input type="checkbox" name="confirmed" value="true" required />
+                        <span>I confirm my age and guardian status as described above.</span>
+                    </label>
+                    <label class="consent-check">
+                        <input type="checkbox" name="privacy" value="true" required />
+                        <span>I acknowledge the <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
+                    </label>
+                    <label class="consent-check">
+                        <input type="checkbox" name="terms" value="true" required />
+                        <span>I acknowledge the <a href="/terms" target="_blank">Terms of Service</a>.</span>
+                    </label>
+                    <button class="auth-button auth-button-primary" type="submit">Confirm age</button>
+                </form>
+            }
+
+            <form method="post" action="/account/privacy-preferences" class="privacy-settings">
+                <AntiforgeryToken />
+                <h2>Privacy preferences</h2>
+                <label class="consent-check">
+                    <input type="checkbox" name="transfer" value="true" checked="@account.InternationalTransferAcknowledged" />
+                    <span>I understand that hosting, database, identity, and support providers may process data outside Peru.</span>
+                </label>
+                <button class="auth-button auth-button-primary" type="submit">Save preferences</button>
+                @if (PreferencesSaved)
+                {
+                    <p class="profile-success" role="status">Privacy preferences saved.</p>
+                }
+            </form>
+
+            <div class="privacy-settings">
+                <h2>Data rights</h2>
+                <p>Download a copy of your account, notebook titles, and journal entries. You can also correct or delete data below.</p>
+                <div class="profile-actions">
+                    <a class="auth-button auth-button-secondary" href="/account/export">Download my data</a>
+                    <a class="auth-button auth-button-secondary" href="/account/delete">Delete account</a>
+                </div>
+            </div>
             <div class="profile-actions">
                 <a class="auth-button auth-button-primary" href="/journals">My journals</a>
-                <a class="auth-button auth-button-secondary" href="/account/delete">Delete account</a>
             </div>
         }
     </section>
@@ -59,6 +103,8 @@
     private string errorMessage = "Your profile could not be loaded. Please sign in again.";
     private string ProfileInitial =>
         string.IsNullOrWhiteSpace(account?.Name) ? "?" : account.Name.Trim()[..1].ToUpperInvariant();
+    [SupplyParameterFromQuery]
+    public bool PreferencesSaved { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

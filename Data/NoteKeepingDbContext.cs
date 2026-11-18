@@ -23,6 +23,7 @@ public class NoteKeepingDbContext : DbContext
     public DbSet<Notebook> Notebooks => Set<Notebook>();
     public DbSet<Note> Notes => Set<Note>();
     public DbSet<UserAccount> UserAccounts => Set<UserAccount>();
+    public DbSet<CopyrightNotice> CopyrightNotices => Set<CopyrightNotice>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -76,6 +77,23 @@ public class NoteKeepingDbContext : DbContext
             entity.Property(u => u.CreatedAt)
                 .HasColumnType("timestamp with time zone")
                 .IsRequired();
+            entity.Property(u => u.AgeConfirmed).IsRequired();
+            entity.Property(u => u.PrivacyPolicyAccepted).IsRequired();
+            entity.Property(u => u.TermsAccepted).IsRequired();
+            entity.Property(u => u.InternationalTransferAcknowledged).IsRequired();
+        });
+
+        modelBuilder.Entity<CopyrightNotice>(entity =>
+        {
+            entity.HasKey(n => n.Id);
+            entity.Property(n => n.ReporterName).IsRequired();
+            entity.Property(n => n.ReporterEmail).IsRequired();
+            entity.Property(n => n.CopyrightWork).IsRequired();
+            entity.Property(n => n.InfringingUrl).IsRequired();
+            entity.Property(n => n.Explanation).IsRequired();
+            entity.Property(n => n.Signature).IsRequired();
+            entity.Property(n => n.Status).IsRequired();
+            entity.Property(n => n.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
         });
     }
 }

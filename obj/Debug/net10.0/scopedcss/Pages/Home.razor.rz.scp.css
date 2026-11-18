@@ -71,7 +71,8 @@
 .journal-page-shell[b-ujv6ega1qq] {
   position: relative;
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   width: 100%;
   font-family: "Inria Serif", "serif";
 }
@@ -143,7 +144,8 @@
 
 .journal-section[b-ujv6ega1qq] {
   width: 700px;
-  height: 637px;
+  min-height: 637px;
+  height: auto;
   background: rgba(255, 255, 255, 0.9);
   margin: 70px auto 30px;
   padding: 0 20px;
@@ -598,7 +600,7 @@
     height: auto;
     min-height: 100vh;
     min-height: 100svh;
-    padding: 16px 14px 28px;
+    padding: 16px 10px 28px;
   }
 
   .logo[b-ujv6ega1qq] {
@@ -620,6 +622,7 @@
     width: 100%;
     max-width: 602px;
     height: auto;
+    min-height: 0;
     margin: 24px auto 0;
     padding: 0 0;
   }
@@ -679,7 +682,7 @@
     box-sizing: border-box;
     height: auto;
     min-height: 0;
-    padding: 16px;
+    padding: 12px;
   }
 
   .journal-area[b-ujv6ega1qq] {
@@ -727,12 +730,12 @@
 
 @media (max-width: 560px) {
   .journal-page-shell[b-ujv6ega1qq] {
-    padding-right: 12px;
-    padding-left: 12px;
+    padding-right: 8px;
+    padding-left: 8px;
   }
 
   .journal-card[b-ujv6ega1qq] {
-    padding: 12px;
+    padding: 6px;
   }
 
   .journal-date-container[b-ujv6ega1qq] {

@@ -30,6 +30,8 @@ main[b-iysa7z3inu] {
 }
 
 .site-footer[b-iysa7z3inu] {
+  position: static;
+  bottom: auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

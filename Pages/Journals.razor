@@ -1,5 +1,5 @@
 @page "/journals"
-@attribute [Authorize]
+@attribute [Authorize(Policy = "AdultConfirmed")]
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization

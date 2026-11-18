@@ -71,6 +71,24 @@
                     </div>
                 </div>
 
+                <div class="auth-field auth-consent">
+                    <label class="consent-check">
+                        <input type="checkbox" @bind="AgeConfirmed" />
+                        <span>I confirm that I am at least 18 years old, or I have the valid consent of a parent or legal guardian.</span>
+                    </label>
+                </div>
+                <div class="auth-field auth-consent">
+                    <label class="consent-check">
+                        <input type="checkbox" @bind="PrivacyAccepted" />
+                        <span>I acknowledge the <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
+                    </label>
+                </div>
+                <div class="auth-field auth-consent">
+                    <label class="consent-check">
+                        <input type="checkbox" @bind="TermsAccepted" />
+                        <span>I acknowledge the <a href="/terms" target="_blank">Terms of Service</a>.</span>
+                    </label>
+                </div>
                 <div class="auth-actions">
                     <button class="auth-button auth-button-primary" type="button" @onclick="RegisterAsync">Create
                         account</button>
@@ -94,6 +112,9 @@
     private string SuccessMessage { get; set; } = string.Empty;
     private bool showPassword;
     private bool showConfirmPassword;
+    private bool AgeConfirmed;
+    private bool PrivacyAccepted;
+    private bool TermsAccepted;
 
     private async Task RegisterAsync()
     {
@@ -130,6 +151,18 @@
             return;
         }
 
+        if (!AgeConfirmed)
+        {
+            ErrorMessage = "You must confirm your age and, if applicable, guardian consent.";
+            return;
+        }
+
+        if (!PrivacyAccepted || !TermsAccepted)
+        {
+            ErrorMessage = "Please acknowledge the Privacy Policy and Terms of Service.";
+            return;
+        }
+
         if (!string.Equals(Password, ConfirmPassword, StringComparison.Ordinal))
         {
             ErrorMessage = "Passwords do not match.";
@@ -150,7 +183,13 @@
             Name = normalizedName,
             Email = lowerEmail,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            AgeConfirmed = true,
+            AgeConfirmedAt = DateTime.UtcNow,
+            PrivacyPolicyAccepted = PrivacyAccepted,
+            PrivacyPolicyAcceptedAt = DateTime.UtcNow,
+            TermsAccepted = TermsAccepted,
+            TermsAcceptedAt = DateTime.UtcNow
         };
 
         DbContext.UserAccounts.Add(user);

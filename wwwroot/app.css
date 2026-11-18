@@ -1,8 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Ingrid+Darling&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@300;400;500;600;700;800;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Ingrid+Darling&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
 
 :root {
   --auth-bg: #f4f2f2;
@@ -419,6 +417,55 @@
   display: grid;
   gap: 0.75rem;
   margin-top: 1.5rem;
+}
+
+.privacy-settings,
+.copyright-form {
+  margin-top: 1.25rem;
+  padding: 1.1rem;
+  border: 1px solid #dfe4ee;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.privacy-settings h2,
+.copyright-form h2 {
+  margin: 0 0 0.65rem;
+  color: #243d75;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+}
+
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0.8rem 0;
+  color: #35445a;
+  line-height: 1.5;
+}
+
+.consent-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.2rem;
+  flex: 0 0 auto;
+  accent-color: #243d75;
+}
+
+.auth-consent {
+  margin: 0.2rem 0;
+}
+
+.profile-success {
+  margin: 0.75rem 0 0;
+  color: #28643b;
+  font-weight: 700;
+}
+
+.copyright-form textarea {
+  min-height: 110px;
+  resize: vertical;
 }
 
 .profile-error {

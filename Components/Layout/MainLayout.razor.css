@@ -30,6 +30,8 @@ main {
 }
 
 .site-footer {
+  position: static;
+  bottom: auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

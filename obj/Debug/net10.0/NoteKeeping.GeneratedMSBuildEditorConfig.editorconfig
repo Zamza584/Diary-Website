@@ -58,6 +58,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29va2llUG9saWN5LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/Copyright.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29weXJpZ2h0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Jupiter/Documents/web-projects/NoteKeeping/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

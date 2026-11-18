@@ -3,129 +3,112 @@
 
 <PageTitle>Privacy Policy | Comfidiario</PageTitle>
 <SeoMetadata Title="Privacy Policy | Comfidiario"
-             Description="Learn what information Comfidiario handles and how account and journal data are used."
+             Description="How Comfidiario handles account, journal, cookie, and privacy-request information."
              CanonicalPath="/privacy"
              Robots="index, follow" />
 
 <main class="legal-page">
     <article class="legal-document">
-        <p class="legal-eyebrow">Legal &amp; Privacy</p>
+        <p class="legal-eyebrow">Legal and privacy</p>
         <h1>Privacy Policy</h1>
-        <p class="legal-updated">Service information draft — review and complete operator and provider details before public launch.</p>
+        <p class="legal-updated">Effective for the current Comfidiario service: 31 March 2025. Last reviewed: 17 November 2026.</p>
 
         <section>
-            <h2>Who operates Comfidiario</h2>
-            <p>
-                Comfidiario is operated by an individual based in Peru. The operator's full legal name and
-                postal contact address have not been supplied for this page and must be added before launch.
-                “We” in this policy refers to the Comfidiario operator.
-            </p>
+            <h2>Who we are</h2>
+            <p>Comfidiario is operated by an individual based in Peru. Before public launch, the operator must add the full legal name, postal address, and monitored privacy email. The missing details do not authorize us to ignore privacy requests.</p>
         </section>
 
         <section>
-            <h2>Information the service handles</h2>
+            <h2>Law and data controller</h2>
+            <p>This policy is prepared for Peru's Ley N.º 29733, Ley de Protección de Datos Personales, and Decreto Supremo N.º 016-2024-JUS. It applies to personal data that Comfidiario decides to collect and determine the purpose of. Other laws may apply where users or providers are located outside Peru.</p>
+        </section>
+
+        <section>
+            <h2>What we collect</h2>
             <ul>
-                <li>
-                    <strong>Account information:</strong> your display name, email address, account creation
-                    time, and a password hash when you register with a password. Passwords are hashed; the
-                    application does not store the submitted password as plain text.
-                </li>
-                <li>
-                    <strong>Sign-in information:</strong> if Google sign-in is enabled, the application uses
-                    the name and email returned during sign-in to find or create an account. Google handles
-                    its own sign-in flow under its own terms and privacy policy.
-                </li>
-                <li>
-                    <strong>Journal information:</strong> journal titles, entries, dates, and page information
-                    that you create. Signed-in journal titles and entry text are protected by ASP.NET Core
-                    Data Protection before being stored in the application's database. This is not
-                    end-to-end encryption: the service can decrypt this information to provide the journal.
-                </li>
-                <li>
-                    <strong>Anonymous journal information:</strong> before sign-in, journal data is stored in
-                    the browser's local storage on that device. It is not automatically transferred into an
-                    account.
-                </li>
-                <li>
-                    <strong>Operational information:</strong> the hosting platform and service providers may
-                    process connection and diagnostic information needed to run, secure, and troubleshoot the
-                    service. The exact log fields and retention periods depend on hosting configuration and
-                    have not been confirmed for this page.
-                </li>
+                <li><strong>Account data:</strong> name, email address, password hash, creation date, consent records, and age-confirmation status.</li>
+                <li><strong>Journal data:</strong> titles, entries, dates, and page information that signed-in users create.</li>
+                <li><strong>Authentication data:</strong> security cookies and optional Google sign-in name and email.</li>
+                <li><strong>Browser data:</strong> anonymous journal content stored in browser local storage.</li>
+                <li><strong>Technical data:</strong> hosting and database diagnostics, connection details, security logs, and provider request information. We do not intentionally collect journal text or passwords in analytics or session replay systems.</li>
+                <li><strong>Rights requests:</strong> copyright notices and support messages, including the contact details you provide.</li>
             </ul>
         </section>
 
         <section>
-            <h2>How information is used</h2>
-            <p>
-                Account information is used to create accounts and authenticate users. Journal information is
-                used to save and display your journals. Technical and diagnostic information may be used to
-                operate, protect, and troubleshoot the application.
-            </p>
+            <h2>Why we use it</h2>
+            <ul>
+                <li>To create and authenticate accounts.</li>
+                <li>To save, display, edit, and delete journals.</li>
+                <li>To protect accounts and investigate abuse or security incidents.</li>
+                <li>To respond to support, copyright, data-protection, and account requests.</li>
+            </ul>
+            <p>Journal titles and entries are not used for advertising or profiling. Data is not sold.</p>
         </section>
 
         <section>
-            <h2>Storage and service providers</h2>
-            <p>
-                The application uses PostgreSQL for its database. The production database provider and
-                processing region are determined by deployment configuration and must be confirmed by the
-                operator. In production, Data Protection keys are configured to persist in Azure Blob Storage;
-                the application also uses Azure App Service diagnostics. Google sign-in is optional and is
-                available only when configured.
-            </p>
-            <p>
-                The application loads some third-party resources, including Google Fonts and GSAP from
-                jsDelivr. A browser may contact those providers when loading pages that use those resources.
-                Their own privacy terms apply to information they receive.
-            </p>
-            <p>
-                The application source does not show an analytics integration. Hosting, database, CDN, or
-                identity-provider logging and processing should be checked in the deployed service settings.
-                The locations where those providers process or store information have not been confirmed here.
-            </p>
+            <h2>Legal bases and minimization</h2>
+            <p>Processing is limited to providing the service, legitimate security and support operations, and your recorded consent where required. The international-transfer acknowledgement can be changed in Profile. Journal content should contain only what you choose to save.</p>
+        </section>
+
+        <section>
+            <h2>Children and minors</h2>
+            <p>The service is intended for adults. Registration requires confirmation that the user is at least 18 or has valid consent from a parent or legal guardian. We do not knowingly collect data from a child where applicable consent has not been obtained. If you believe a minor's data was supplied without valid authority, use <a href="/contact">Contact &amp; Support</a> or delete the account.</p>
+        </section>
+
+        <section>
+            <h2>Security</h2>
+            <p>Passwords are hashed with BCrypt. Signed-in journal titles and entry text are encrypted with ASP.NET Core Data Protection before database storage. This is application-level encryption, not end-to-end encryption: Comfidiario can decrypt it to provide the service. Authentication and session cookies are HTTP-only and HTTPS is required in production. Database and provider access must remain restricted.</p>
+        </section>
+
+        <section>
+            <h2>Providers and international transfers</h2>
+            <p>Comfidiario may use PostgreSQL, Azure App Service, Azure Blob Storage, Azure diagnostics, and optional Google sign-in. The deployed regions and providers must be confirmed by the operator. Providers may process or store data outside Peru. The application asks users to acknowledge this in Profile and discloses that processing in this policy.</p>
+            <p>The application loads no Google Fonts or jsDelivr/GSAP script. Google sign-in is an optional provider and is available only when configured.</p>
         </section>
 
         <section>
             <h2>Cookies and browser storage</h2>
-            <p>
-                The service uses cookies for authentication and session functionality, and antiforgery tokens
-                to protect form submissions. Optional Google sign-in uses a short-lived external sign-in
-                cookie when configured. Anonymous journal content is kept in local storage, not a cookie.
-                See the <a href="/cookies">Cookie Policy</a> for more detail.
-            </p>
+            <p>Required authentication, session, external sign-in, and antiforgery cookies are described in the <a href="/cookies">Cookie Policy</a>. Anonymous journal content is stored only in browser local storage. The application does not intentionally run advertising, analytics, or session-replay trackers.</p>
         </section>
 
         <section>
             <h2>Retention and deletion</h2>
-            <p>
-                Account and journal records remain in the application database until deleted or otherwise
-                removed by the operator. Signed-in users can request deletion using the account deletion
-                function in the application; deleting the account also deletes its journals and entries
-                through the database's configured relationships. Copies in backups, diagnostic logs, or
-                provider systems may remain until their applicable retention and deletion processes remove
-                them. Those periods have not been verified and should be confirmed before launch.
-            </p>
+            <p>Account and journal records remain until deleted or removed under a documented retention process. Signed-in users can permanently delete their account and associated journals from <a href="/account/delete">Delete account</a>. Provider backups, security logs, and notice records may remain for the period needed for backup restoration, incident evidence, legal defense, or request handling, subject to documented limits.</p>
         </section>
 
         <section>
-            <h2>Your choices and requests</h2>
-            <p>
-                You can edit journal information in the application and delete your account from the account
-                deletion page. To ask a privacy question or make another data request, contact the operator
-                using the address on the <a href="/contact">Contact &amp; Support</a> page. The email shown
-                there is currently a placeholder and must be replaced before launch.
-            </p>
-            <p>
-                Privacy requirements may vary depending on where you live and how the service is offered.
-                This page does not determine whether a particular law applies or claim compliance with any
-                law. The operator should obtain appropriate legal advice and complete the missing provider,
-                location, retention, identity, and contact details.
-            </p>
+            <h2>Your rights</h2>
+            <p>Subject to identity and legal verification, you may request access, correction, deletion, information about processing, withdrawal of consent, or portability. You can:</p>
+            <ul>
+                <li>Download account and journal data from <a href="/profile">Profile</a>.</li>
+                <li>Edit or delete journals while signed in.</li>
+                <li>Change the international-transfer acknowledgement in Profile.</li>
+                <li>Delete the active account and associated journals from Account deletion.</li>
+                <li>Submit a support or privacy request through <a href="/contact">Contact &amp; Support</a>.</li>
+            </ul>
+            <p>Requests should not include passwords or unnecessary journal content. The operator must establish a verified response workflow and preserve evidence of handling only as needed.</p>
+        </section>
+
+        <section>
+            <h2>Database and regulatory registration</h2>
+            <p>The operator must determine whether the personal database requires registration or notification with the Autoridad Nacional de Protección de Datos Personales and maintain a record of processing activities, security measures, provider contracts, retention periods, and transfer safeguards.</p>
+        </section>
+
+        <section>
+            <h2>Copyright notices</h2>
+            <p>Copyright and counter-notice information is handled separately through the <a href="/copyright">Copyright complaint form</a>. Details are retained only for review, communication, legal documentation, and abuse prevention.</p>
+        </section>
+
+        <section>
+            <h2>Changes</h2>
+            <p>Material changes will be dated and disclosed on this page. Public legal terms must be reviewed by Peruvian legal counsel before launch.</p>
         </section>
 
         <nav class="legal-page-links" aria-label="Other legal pages">
             <a href="/terms">Terms of Service</a>
             <a href="/cookies">Cookie Policy</a>
+            <a href="/copyright">Copyright</a>
             <a href="/contact">Contact &amp; Support</a>
         </nav>
     </article>

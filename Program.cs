@@ -31,7 +31,8 @@ static ClaimsPrincipal CreateUserPrincipal(UserAccount user)
     {
         new(ClaimTypes.Name, user.Name),
         new(ClaimTypes.Email, user.Email),
-        new(ClaimTypes.NameIdentifier, user.Id.ToString())
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new("adult-confirmed", user.AgeConfirmed ? "true" : "false")
     };
 
     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -152,8 +153,8 @@ if (!string.IsNullOrWhiteSpace(dataProtectionBlobUri))
     {
         var managedIdentityClientId = builder.Configuration["DataProtection:Azure:ManagedIdentityClientId"];
         credential = string.IsNullOrWhiteSpace(managedIdentityClientId)
-            ? new ManagedIdentityCredential()
-            : new ManagedIdentityCredential(managedIdentityClientId);
+            ? new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned)
+            : new ManagedIdentityCredential(ManagedIdentityId.FromUserAssignedClientId(managedIdentityClientId));
     }
     else
     {
@@ -242,6 +243,11 @@ if (googleAuthenticationConfigured)
 }
 
 builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdultConfirmed", policy =>
+        policy.RequireClaim("adult-confirmed", "true"));
+});
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<ThemeService>();
 
@@ -271,6 +277,18 @@ builder.Services.AddRateLimiter(options =>
         {
             PermitLimit = 10,
             Window = TimeSpan.FromMinutes(5),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        });
+    });
+
+    options.AddPolicy("copyright", httpContext =>
+    {
+        var remoteIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(remoteIp, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(15),
             QueueLimit = 0,
             AutoReplenishment = true
         });
@@ -384,7 +402,10 @@ app.MapGet("/auth/google-callback", async (HttpContext httpContext, NoteKeepingD
             Email = normalizedEmail,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(
                 Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            AgeConfirmed = false,
+            PrivacyPolicyAccepted = false,
+            TermsAccepted = false
         };
 
         dbContext.UserAccounts.Add(user);
@@ -468,6 +489,170 @@ app.MapPost("/account/delete", async (
 
     return Results.Redirect("/login?deleted=true");
 }).RequireAuthorization();
+
+app.MapPost("/account/age-confirmation", async (
+    HttpContext httpContext,
+    NoteKeepingDbContext dbContext,
+    [FromForm] bool confirmed,
+    [FromForm] bool privacy,
+    [FromForm] bool terms) =>
+{
+    if (!confirmed || !privacy || !terms)
+    {
+        return Results.Redirect("/profile?error=confirmation-required");
+    }
+
+    var accountIdValue = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!int.TryParse(accountIdValue, out var accountId))
+    {
+        return Results.Redirect("/login");
+    }
+
+    var account = await dbContext.UserAccounts.SingleOrDefaultAsync(user => user.Id == accountId);
+    if (account is null)
+    {
+        return Results.Redirect("/login");
+    }
+
+    var now = DateTime.UtcNow;
+    account.AgeConfirmed = true;
+    account.AgeConfirmedAt = now;
+    account.PrivacyPolicyAccepted = true;
+    account.PrivacyPolicyAcceptedAt = now;
+    account.TermsAccepted = true;
+    account.TermsAcceptedAt = now;
+    await dbContext.SaveChangesAsync();
+
+    await httpContext.SignInAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        CreateUserPrincipal(account),
+        new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
+    return Results.Redirect("/profile");
+}).RequireAuthorization();
+
+app.MapPost("/account/privacy-preferences", async (
+    HttpContext httpContext,
+    NoteKeepingDbContext dbContext,
+    [FromForm] bool transfer) =>
+{
+    var accountIdValue = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!int.TryParse(accountIdValue, out var accountId))
+    {
+        return Results.Redirect("/login");
+    }
+
+    var account = await dbContext.UserAccounts.SingleOrDefaultAsync(user => user.Id == accountId);
+    if (account is null)
+    {
+        return Results.Redirect("/login");
+    }
+
+    var now = DateTime.UtcNow;
+    if (transfer != account.InternationalTransferAcknowledged)
+    {
+        account.InternationalTransferAcknowledged = transfer;
+        account.InternationalTransferAcknowledgedAt = transfer ? now : null;
+    }
+
+    await dbContext.SaveChangesAsync();
+    return Results.Redirect("/profile?preferencesSaved=true");
+}).RequireAuthorization();
+
+app.MapGet("/account/export", async (
+    HttpContext httpContext,
+    NoteKeepingDbContext dbContext) =>
+{
+    var accountIdValue = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (!int.TryParse(accountIdValue, out var accountId))
+    {
+        return Results.Redirect("/login");
+    }
+
+    var account = await dbContext.UserAccounts
+        .AsNoTracking()
+        .Include(user => user.Notebooks!)
+        .ThenInclude(notebook => notebook.Notes)
+        .SingleOrDefaultAsync(user => user.Id == accountId);
+    if (account is null)
+    {
+        return Results.Redirect("/login");
+    }
+
+    var export = new
+    {
+        account = new
+        {
+            account.Name,
+            account.Email,
+            account.CreatedAt,
+            account.AgeConfirmed,
+            account.InternationalTransferAcknowledged
+        },
+        journals = account.Notebooks.Select(notebook => new
+        {
+            notebook.Title,
+            notebook.Date,
+            notebook.CurrentPage,
+            notebook.TotalPages,
+            entries = notebook.Notes.Select(note => new
+            {
+                note.Text,
+                note.Date
+            })
+        })
+    };
+
+    var json = System.Text.Json.JsonSerializer.Serialize(export, new System.Text.Json.JsonSerializerOptions
+    {
+        WriteIndented = true
+    });
+    return Results.File(
+        System.Text.Encoding.UTF8.GetBytes(json),
+        "application/json",
+        $"comfidiario-data-export-{DateTime.UtcNow:yyyy-MM-dd}.json");
+}).RequireAuthorization();
+
+app.MapPost("/copyright/notice", async (
+    HttpContext httpContext,
+    NoteKeepingDbContext dbContext,
+    [FromForm] string reporterName,
+    [FromForm] string reporterEmail,
+    [FromForm] string copyrightWork,
+    [FromForm] string infringingUrl,
+    [FromForm] string explanation,
+    [FromForm] string signature,
+    [FromForm] bool accuracy,
+    [FromForm] bool authority) =>
+{
+    if (new[] { reporterName, reporterEmail, copyrightWork, infringingUrl, explanation, signature }
+        .Any(string.IsNullOrWhiteSpace) ||
+        !accuracy ||
+        !authority)
+    {
+        return Results.Redirect("/copyright?error=incomplete");
+    }
+
+    var notice = new CopyrightNotice
+    {
+        ReporterName = reporterName.Trim(),
+        ReporterEmail = reporterEmail.Trim(),
+        CopyrightWork = copyrightWork.Trim(),
+        InfringingUrl = infringingUrl.Trim(),
+        Explanation = explanation.Trim(),
+        Signature = signature.Trim(),
+        AccuracyDeclarationAccepted = accuracy,
+        AuthorityDeclarationAccepted = authority,
+        CreatedAt = DateTime.UtcNow
+    };
+    dbContext.CopyrightNotices.Add(notice);
+    await dbContext.SaveChangesAsync();
+    return Results.Redirect("/copyright?received=true");
+}).RequireRateLimiting("copyright");
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

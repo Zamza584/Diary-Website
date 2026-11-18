@@ -22,6 +22,56 @@ namespace NoteKeeping.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("NoteKeeping.Models.CopyrightNotice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AccuracyDeclarationAccepted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AuthorityDeclarationAccepted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CopyrightWork")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Explanation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("InfringingUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReporterEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReporterName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Signature")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CopyrightNotices");
+                });
+
             modelBuilder.Entity("NoteKeeping.Models.Note", b =>
                 {
                     b.Property<int>("Id")
@@ -86,12 +136,24 @@ namespace NoteKeeping.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AgeConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("AgeConfirmedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("InternationalTransferAcknowledged")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("InternationalTransferAcknowledgedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -100,6 +162,18 @@ namespace NoteKeeping.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("PrivacyPolicyAccepted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("PrivacyPolicyAcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("TermsAccepted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("TermsAcceptedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -123,7 +197,7 @@ namespace NoteKeeping.Migrations
             modelBuilder.Entity("NoteKeeping.Models.Notebook", b =>
                 {
                     b.HasOne("NoteKeeping.Models.UserAccount", "UserAccount")
-                        .WithMany()
+                        .WithMany("Notebooks")
                         .HasForeignKey("UserAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -134,6 +208,11 @@ namespace NoteKeeping.Migrations
             modelBuilder.Entity("NoteKeeping.Models.Notebook", b =>
                 {
                     b.Navigation("Notes");
+                });
+
+            modelBuilder.Entity("NoteKeeping.Models.UserAccount", b =>
+                {
+                    b.Navigation("Notebooks");
                 });
 #pragma warning restore 612, 618
         }

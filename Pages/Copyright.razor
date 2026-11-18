@@ -1,0 +1,80 @@
+@page "/copyright"
+
+<PageTitle>Copyright and content complaints | Comfidiario</PageTitle>
+<SeoMetadata Title="Copyright and content complaints | Comfidiario"
+             Description="Report copyrighted or unauthorized content published through Comfidiario."
+             CanonicalPath="/copyright" />
+
+<main class="legal-page">
+    <article class="legal-document">
+        <p class="legal-eyebrow">Rights and content</p>
+        <h1>Copyright and content complaints</h1>
+
+        @if (Received)
+        {
+            <p class="profile-success" role="status">Your notice was received. We will review it and may contact you for more information.</p>
+        }
+        else if (Error == "incomplete")
+        {
+            <p class="profile-error" role="alert">Complete every field and accept both declarations.</p>
+        }
+
+        <section>
+            <h2>Our rule</h2>
+            <p>Users retain responsibility for the content they enter. Do not upload, paste, or share material that you do not have permission to use. We may remove or restrict access to content where we reasonably believe it infringes rights or violates law.</p>
+        </section>
+
+        <form method="post" action="/copyright/notice" class="copyright-form">
+            <AntiforgeryToken />
+            <div class="auth-field">
+                <label for="reporter-name">Your name</label>
+                <input class="auth-input" id="reporter-name" name="reporterName" required />
+            </div>
+            <div class="auth-field">
+                <label for="reporter-email">Contact email</label>
+                <input class="auth-input" id="reporter-email" name="reporterEmail" type="email" required />
+            </div>
+            <div class="auth-field">
+                <label for="copyright-work">Copyrighted work or description</label>
+                <textarea class="auth-input" id="copyright-work" name="copyrightWork" required></textarea>
+            </div>
+            <div class="auth-field">
+                <label for="infringing-url">Location or account containing the disputed content</label>
+                <input class="auth-input" id="infringing-url" name="infringingUrl" required />
+            </div>
+            <div class="auth-field">
+                <label for="explanation">Why the content is unauthorized</label>
+                <textarea class="auth-input" id="explanation" name="explanation" required></textarea>
+            </div>
+            <div class="auth-field">
+                <label for="signature">Electronic signature</label>
+                <input class="auth-input" id="signature" name="signature" required />
+            </div>
+            <label class="consent-check">
+                <input type="checkbox" name="accuracy" value="true" required />
+                <span>I declare that the information in this notice is accurate and that I am the rights holder or authorized to act for the rights holder.</span>
+            </label>
+            <label class="consent-check">
+                <input type="checkbox" name="authority" value="true" required />
+                <span>I understand this notice may be shared with the affected account holder to support review and a response.</span>
+            </label>
+            <button class="auth-button auth-button-primary" type="submit">Submit complaint</button>
+        </form>
+
+        <section>
+            <h2>Counter-notice</h2>
+            <p>If you believe removed content was restricted in error, submit the same form and explain the basis for restoration in the description. Include the original location and any relevant authorization or fair-use grounds.</p>
+        </section>
+
+        <nav class="legal-page-links" aria-label="Related pages">
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/contact">Contact &amp; Support</a>
+        </nav>
+    </article>
+</main>
+
+@code {
+    [SupplyParameterFromQuery] public bool Received { get; set; }
+    [SupplyParameterFromQuery] public string? Error { get; set; }
+}
